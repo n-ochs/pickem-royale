@@ -1,0 +1,12 @@
+{
+	"tslintIntegration": true,
+	"useTabs": true,
+	"arrowParens": "always",
+	"printWidth": 175,
+	"jsxSingleQuote": true,
+	"singleQuote": true,
+	"endOfLine": "lf",
+	"tabWidth": 4,
+	"semi": true,
+	"trailingComma": "none"
+}
