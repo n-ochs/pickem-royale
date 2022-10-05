@@ -1,7 +1,8 @@
+import SignInForm from '@components/auth/signin.component';
 import type { NextPage } from 'next';
 
 const SignIn: NextPage = () => {
-	return <div>sign in</div>;
+	return <SignInForm />;
 };
 
 export default SignIn;
