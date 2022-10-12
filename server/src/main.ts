@@ -10,6 +10,12 @@ async function bootstrap(): Promise<void> {
 	// Set Globals
 	app.setGlobalPrefix('/api');
 	app.useGlobalPipes(new ValidationPipe());
+	app.enableCors({
+		methods: '*',
+		origin: 'http://localhost:3000',
+		exposedHeaders: '*',
+		credentials: true
+	});
 
 	// Enable Prisma
 	const prismaService: PrismaService = app.get(PrismaService);
