@@ -1,15 +1,26 @@
-import React, { FormEvent, useRef, useState } from 'react';
+import axios from 'axios';
+import React, { FormEvent, useState } from 'react';
 
 const SignInForm: React.FC = () => {
 	// const router: NextRouter = useRouter();
-	const emailAddressInputRef: React.MutableRefObject<HTMLInputElement> = useRef(null);
 
 	const [emailAddress, setEmailAddress] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	const handleSignIn: (e: FormEvent) => void = async (e: FormEvent) => {
 		e.preventDefault();
-		// do something
+		try {
+			const resp: any = await axios.post(
+				'http://localhost:8080/api/auth/signin',
+				{
+					email: emailAddress,
+					password
+				},
+				{ headers: { 'Content-Type': 'application/json' } }
+			);
+			axios.defaults.headers.common.Authorization = `Bearer ${resp.data.accessToken}`;
+			sessionStorage.setItem('LOGGED_IN', 'Y');
+		} catch (error) {}
 	};
 
 	return (
@@ -23,7 +34,6 @@ const SignInForm: React.FC = () => {
 					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
 					placeholder='Email address'
 					value={emailAddress}
-					ref={emailAddressInputRef}
 					onChange={(e) => setEmailAddress(e.target.value)}
 				/>
 				<label htmlFor='email' className='auth-input'>
