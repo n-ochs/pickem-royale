@@ -99,7 +99,7 @@ export class AuthService {
 		});
 	}
 
-	async refreshToken(userId: number, rt: string): Promise<Tokens> {
+	async refreshTokens(userId: number, rt: string): Promise<Tokens> {
 		// Find the user
 		const user: User = await this.prisma.user.findUnique({
 			where: {
