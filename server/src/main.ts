@@ -1,3 +1,5 @@
+import * as cookieParser from 'cookie-parser';
+
 import { AppModule } from '@app/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -9,6 +11,7 @@ async function bootstrap(): Promise<void> {
 
 	// Set Globals
 	app.setGlobalPrefix('/api');
+	app.use(cookieParser());
 	app.useGlobalPipes(new ValidationPipe());
 	app.enableCors({
 		methods: '*',

@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useState } from 'react';
 
 const SignInForm: React.FC = () => {
-	// const router: NextRouter = useRouter();
+	const router: NextRouter = useRouter();
 
 	const [emailAddress, setEmailAddress] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
@@ -16,10 +17,11 @@ const SignInForm: React.FC = () => {
 					email: emailAddress,
 					password
 				},
-				{ headers: { 'Content-Type': 'application/json' } }
+				{ headers: { 'Content-Type': 'application/json' }, withCredentials: true }
 			);
-			axios.defaults.headers.common.Authorization = `Bearer ${resp.data.accessToken}`;
-			sessionStorage.setItem('LOGGED_IN', 'Y');
+			console.log(resp);
+			router.push('/');
+			// sessionStorage.setItem('LOGGED_IN', 'Y');
 		} catch (error) {}
 	};
 
