@@ -22,7 +22,9 @@ const SignInForm: React.FC = () => {
 			console.log(resp);
 			router.push('/');
 			// sessionStorage.setItem('LOGGED_IN', 'Y');
-		} catch (error) {}
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (

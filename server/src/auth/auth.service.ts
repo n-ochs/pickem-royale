@@ -1,8 +1,11 @@
 import * as argon from 'argon2';
+import * as dayjs from 'dayjs';
+import { Response as Res } from 'express';
 
 import { AuthDto } from '@auth/dto';
 import { JwtPayload, Tokens as Tokens } from '@auth/types';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@common/constants';
+import { ForbiddenException, Injectable, Response } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
@@ -20,13 +23,11 @@ export class AuthService {
 		const [at, rt] = await Promise.all([
 			this.jwtService.signAsync(jwtPayload, {
 				secret: process.env.AT_SECRET,
-				// replace w/ dayjs
 				expiresIn: '15m'
 			}),
 			this.jwtService.signAsync(jwtPayload, {
 				secret: process.env.RT_SECRET,
-				// replace w/ dayjs
-				expiresIn: '7d'
+				expiresIn: '2h'
 			})
 		]);
 
@@ -65,7 +66,7 @@ export class AuthService {
 		return tokens;
 	}
 
-	async signIn(dto: AuthDto): Promise<Tokens> {
+	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
 		// Find user
 		const user: User = await this.prisma.user.findUnique({
 			where: {
@@ -78,14 +79,27 @@ export class AuthService {
 		const passwordMatches: boolean = await argon.verify(user.hash, dto.password);
 		if (!passwordMatches) throw new ForbiddenException('Access Denied');
 
-		// Issue Tokens
+		// Generate Tokens
 		const tokens: Tokens = await this.getTokens(user.id, user.email);
 		await this.updateRtHash(user.id, tokens.refreshToken);
+		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
+		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
-		return tokens;
+		// Send response with cookies
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
+			REFRESH_TOKEN,
+			tokens.refreshToken,
+			{
+				httpOnly: true,
+				secure: true,
+				expires: refreshTokenExp,
+				sameSite: true,
+				path: '/'
+			}
+		);
 	}
 
-	async signOut(userId: number): Promise<void> {
+	async signOut(userId: number, @Response({ passthrough: true }) res: Res): Promise<void> {
 		await this.prisma.user.updateMany({
 			where: {
 				id: userId,
@@ -97,9 +111,10 @@ export class AuthService {
 				hashedRt: null
 			}
 		});
+		res.clearCookie(ACCESS_TOKEN).clearCookie(REFRESH_TOKEN);
 	}
 
-	async refreshTokens(userId: number, rt: string): Promise<Tokens> {
+	async refreshTokens(userId: number, rt: string, @Response({ passthrough: true }) res: Res): Promise<void> {
 		// Find the user
 		const user: User = await this.prisma.user.findUnique({
 			where: {
@@ -108,14 +123,28 @@ export class AuthService {
 		});
 		if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
 
-		// Verify password & hash match
+		// Verify refreshToken & hashedRt match
 		const rtMatches: boolean = await argon.verify(user.hashedRt, rt);
 		if (!rtMatches) throw new ForbiddenException('Access Denied');
 
-		// Issue Tokens
+		// Generate Tokens
 		const tokens: Tokens = await this.getTokens(user.id, user.email);
 		await this.updateRtHash(user.id, tokens.refreshToken);
 
-		return tokens;
+		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
+		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
+
+		// Send response with cookies
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
+			REFRESH_TOKEN,
+			tokens.refreshToken,
+			{
+				httpOnly: true,
+				secure: true,
+				expires: refreshTokenExp,
+				sameSite: true,
+				path: '/'
+			}
+		);
 	}
 }

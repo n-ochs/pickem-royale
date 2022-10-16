@@ -22,6 +22,7 @@ export class AtStrategy extends PassportStrategy(Strategy, JWT) {
 		return null;
 	}
 
+	// Validate JWT Signature
 	validate(payload: JwtPayload): JwtPayload {
 		return payload;
 	}

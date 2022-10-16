@@ -5,7 +5,19 @@ import type { NextPage } from 'next';
 const Home: NextPage = () => {
 	const test: () => Promise<void> = async () => {
 		try {
-			await axios.get('http://localhost:8080/api/app', { headers: { 'Content-Type': 'application/json' }, withCredentials: true });
+			await axios.get('http://localhost:8080/api/app', { withCredentials: true });
+		} catch (error) {}
+	};
+
+	const signOut: () => Promise<void> = async () => {
+		try {
+			await axios.post('http://localhost:8080/api/auth/signout', null, { withCredentials: true });
+		} catch (error) {}
+	};
+
+	const refreshToken: () => Promise<void> = async () => {
+		try {
+			await axios.post('http://localhost:8080/api/auth/refresh', null, { withCredentials: true });
 		} catch (error) {}
 	};
 	return (
@@ -17,6 +29,8 @@ const Home: NextPage = () => {
 				<a>Sign Up</a>
 			</Link>
 			<button onClick={test}>test</button>
+			<button onClick={signOut}>signout</button>
+			<button onClick={refreshToken}>refresh</button>
 		</div>
 	);
 };
