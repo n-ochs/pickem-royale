@@ -5,7 +5,7 @@ import type { NextPage } from 'next';
 const Home: NextPage = () => {
 	const test: () => Promise<void> = async () => {
 		try {
-			await APIService.post('/app');
+			await APIService.get('/app');
 		} catch (error) {}
 	};
 

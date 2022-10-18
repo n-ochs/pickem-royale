@@ -19,7 +19,7 @@ APIService.interceptors.response.use(
 				case 'get':
 					return APIService.get(`${error.config.baseURL}${error.config.url}`);
 				case 'post':
-					return APIService.post(`${error.config.baseURL}${error.config.url}`, error.config.data);
+					return APIService.post(`${error.config.baseURL}${error.config.url}`, JSON.parse(error.config.data));
 				default:
 					break;
 			}
