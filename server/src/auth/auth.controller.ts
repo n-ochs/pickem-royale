@@ -5,7 +5,7 @@ import { AuthDto } from '@auth/dto';
 import { Tokens } from '@auth/types';
 import { REFRESH_TOKEN } from '@common/constants';
 import { GetCurrentUser, GetCurrentUserId, Public } from '@common/decorators';
-import { AtGuard, RtGuard } from '@common/guards';
+import { RtGuard } from '@common/guards';
 import { Body, Controller, HttpCode, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
 
 @Controller('auth')
@@ -26,7 +26,6 @@ export class AuthController {
 		return this.authService.signIn(dto, res);
 	}
 
-	@UseGuards(AtGuard)
 	@Post('signout')
 	@HttpCode(HttpStatus.OK)
 	async signOut(@GetCurrentUserId() userId: number, @Response({ passthrough: true }) res: Res): Promise<void> {

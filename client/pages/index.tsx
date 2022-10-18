@@ -1,23 +1,23 @@
-import axios from 'axios';
 import Link from 'next/link';
+import APIService from 'util/api_service';
 
 import type { NextPage } from 'next';
 const Home: NextPage = () => {
 	const test: () => Promise<void> = async () => {
 		try {
-			await axios.get('http://localhost:8080/api/app', { withCredentials: true });
+			await APIService.post('/app');
 		} catch (error) {}
 	};
 
 	const signOut: () => Promise<void> = async () => {
 		try {
-			await axios.post('http://localhost:8080/api/auth/signout', null, { withCredentials: true });
+			await APIService.post('http://localhost:8080/api/auth/signout', null, { withCredentials: true });
 		} catch (error) {}
 	};
 
 	const refreshToken: () => Promise<void> = async () => {
 		try {
-			await axios.post('http://localhost:8080/api/auth/refresh', null, { withCredentials: true });
+			await APIService.post('http://localhost:8080/api/auth/refresh', null, { withCredentials: true });
 		} catch (error) {}
 	};
 	return (

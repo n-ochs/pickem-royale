@@ -1,29 +1,20 @@
-import axios from 'axios';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useState } from 'react';
+import APIService from 'util/api_service';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
 
-	const [emailAddress, setEmailAddress] = useState<string>('');
+	const [email, setEmailAddress] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	const handleSignIn: (e: FormEvent) => void = async (e: FormEvent) => {
 		e.preventDefault();
 		try {
-			const resp: any = await axios.post(
-				'http://localhost:8080/api/auth/signin',
-				{
-					email: emailAddress,
-					password
-				},
-				{ headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-			);
-			console.log(resp);
+			await APIService.post('/auth/signin', { email, password }, { headers: { 'Content-Type': 'application/json' } });
 			router.push('/');
-			// sessionStorage.setItem('LOGGED_IN', 'Y');
 		} catch (error) {
-			console.error(error);
+			// console.error(error);
 		}
 	};
 
@@ -37,7 +28,7 @@ const SignInForm: React.FC = () => {
 					type='text'
 					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
 					placeholder='Email address'
-					value={emailAddress}
+					value={email}
 					onChange={(e) => setEmailAddress(e.target.value)}
 				/>
 				<label htmlFor='email' className='auth-input'>
