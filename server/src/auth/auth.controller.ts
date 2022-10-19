@@ -2,7 +2,6 @@ import { Response as Res } from 'express';
 
 import { AuthService } from '@auth/auth.service';
 import { AuthDto } from '@auth/dto';
-import { Tokens } from '@auth/types';
 import { REFRESH_TOKEN } from '@common/constants';
 import { GetCurrentUser, GetCurrentUserId, Public } from '@common/decorators';
 import { RtGuard } from '@common/guards';
@@ -15,8 +14,8 @@ export class AuthController {
 	@Public()
 	@Post('signup')
 	@HttpCode(HttpStatus.CREATED)
-	async signUp(@Body() dto: AuthDto): Promise<Tokens> {
-		return this.authService.signUp(dto);
+	async signUp(@Body() dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
+		return this.authService.signUp(dto, res);
 	}
 
 	@Public()

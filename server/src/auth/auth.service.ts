@@ -50,9 +50,11 @@ export class AuthService {
 		});
 	}
 
-	async signUp(dto: AuthDto): Promise<Tokens> {
+	async signUp(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
+		// Hash password
 		const hashedPassword: string = await argon.hash(dto.password);
 
+		// Create user in DB
 		const newUser: User = await this.prisma.user.create({
 			data: {
 				email: dto.email,
@@ -60,10 +62,24 @@ export class AuthService {
 			}
 		});
 
+		// Generate Tokens
 		const tokens: Tokens = await this.getTokens(newUser.id, newUser.email);
 		await this.updateRtHash(newUser.id, tokens.refreshToken);
+		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
+		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
-		return tokens;
+		// Send response with cookies
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
+			REFRESH_TOKEN,
+			tokens.refreshToken,
+			{
+				httpOnly: true,
+				secure: true,
+				expires: refreshTokenExp,
+				sameSite: true,
+				path: '/'
+			}
+		);
 	}
 
 	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
