@@ -10,7 +10,7 @@ APIService.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
-		if (error.response.config.url === '/auth/refresh') {
+		if (error.response.config.url === '/auth/refresh' && error.response.status === 401) {
 			return Promise.reject(error);
 		}
 		if (error.response.status === 401) {

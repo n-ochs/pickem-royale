@@ -1,11 +1,13 @@
 import { NextRouter, useRouter } from 'next/router';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import APIService from 'util/api_service';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
+	const emailInputRef: React.MutableRefObject<HTMLInputElement> = useRef(null);
 
-	const [email, setEmailAddress] = useState<string>('');
+	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	const handleSignIn: (e: FormEvent) => void = async (e: FormEvent) => {
@@ -13,8 +15,12 @@ const SignInForm: React.FC = () => {
 		try {
 			await APIService.post('/auth/signin', { email, password }, { headers: { 'Content-Type': 'application/json' } });
 			router.push('/');
+			toast.success('Successfully logged in.');
 		} catch (error) {
-			// console.error(error);
+			toast.error('Incorrect username or password. Please try again.');
+			setEmail('');
+			setPassword('');
+			emailInputRef.current.focus();
 		}
 	};
 
@@ -29,7 +35,8 @@ const SignInForm: React.FC = () => {
 					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
 					placeholder='Email address'
 					value={email}
-					onChange={(e) => setEmailAddress(e.target.value)}
+					ref={emailInputRef}
+					onChange={(e) => setEmail(e.target.value)}
 				/>
 				<label htmlFor='email' className='auth-input'>
 					Email address
