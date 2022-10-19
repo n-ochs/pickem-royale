@@ -1,12 +1,17 @@
 import Link from 'next/link';
-import APIService from 'util/api_service';
+import toast from 'react-hot-toast';
+
+import APIService from '@util/api_service';
 
 import type { NextPage } from 'next';
+
 const Home: NextPage = () => {
 	const test: () => Promise<void> = async () => {
 		try {
 			await APIService.get('/app');
-		} catch (error) {}
+		} catch (error) {
+			toast.error(error.response?.status === 401 ? 'You must be signed in to perform this action.' : 'Error: Please contact support.');
+		}
 	};
 
 	const signOut: () => Promise<void> = async () => {

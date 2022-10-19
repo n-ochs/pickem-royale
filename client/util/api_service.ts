@@ -10,16 +10,16 @@ APIService.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
-		if (error.response.config.url === '/auth/refresh' && error.response.status === 401) {
+		if (error.response?.config?.url === '/auth/refresh' && error?.response?.status === 401) {
 			return Promise.reject(error);
 		}
-		if (error.response.status === 401) {
+		if (error?.response?.status === 401) {
 			await APIService.post('/auth/refresh', null);
-			switch (error.config.method) {
+			switch (error?.config?.method) {
 				case 'get':
-					return APIService.get(`${error.config.baseURL}${error.config.url}`);
+					return APIService.get(`${error?.config?.baseURL}${error?.config?.url}`);
 				case 'post':
-					return APIService.post(`${error.config.baseURL}${error.config.url}`, JSON.parse(error.config.data));
+					return APIService.post(`${error?.config?.baseURL}${error?.config?.url}`, JSON.parse(error?.config?.data));
 				default:
 					break;
 			}

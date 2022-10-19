@@ -1,7 +1,8 @@
 import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import APIService from 'util/api_service';
+
+import APIService from '@util/api_service';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
@@ -17,7 +18,7 @@ const SignInForm: React.FC = () => {
 			router.push('/');
 			toast.success('Successfully logged in.');
 		} catch (error) {
-			toast.error('Incorrect username or password. Please try again.');
+			toast.error(error.response?.status === 403 ? 'Incorrect username or password. Please try again.' : 'Error: Please contact support.');
 			setEmail('');
 			setPassword('');
 			emailInputRef.current.focus();
