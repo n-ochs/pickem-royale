@@ -6,25 +6,13 @@ import APIService from '@util/api_service';
 import type { NextPage } from 'next';
 
 const Home: NextPage = () => {
-	const test: () => Promise<void> = async () => {
-		try {
-			await APIService.get('/app');
-		} catch (error) {
-			toast.error(error.response?.status === 401 ? 'You must be signed in to perform this action.' : 'Error: Please contact support.');
-		}
-	};
-
 	const signOut: () => Promise<void> = async () => {
 		try {
-			await APIService.post('http://localhost:8080/api/auth/signout', null, { withCredentials: true });
+			await APIService.post('/auth/signout', null, { withCredentials: true });
+			toast.success('Successfully signed out.');
 		} catch (error) {}
 	};
 
-	const refreshToken: () => Promise<void> = async () => {
-		try {
-			await APIService.post('http://localhost:8080/api/auth/refresh', null, { withCredentials: true });
-		} catch (error) {}
-	};
 	return (
 		<div className='space-x-4'>
 			<Link href='/signin'>
@@ -33,9 +21,7 @@ const Home: NextPage = () => {
 			<Link href='/signup'>
 				<a>Sign Up</a>
 			</Link>
-			<button onClick={test}>test</button>
 			<button onClick={signOut}>signout</button>
-			<button onClick={refreshToken}>refresh</button>
 		</div>
 	);
 };

@@ -39,7 +39,7 @@ const SignUpForm: React.FC = () => {
 					id='email'
 					name='email'
 					type='text'
-					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
+					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryBlue focus:outline-none'
 					placeholder='Email address'
 					value={email}
 					ref={emailInputRef}
@@ -54,7 +54,7 @@ const SignUpForm: React.FC = () => {
 					id='password'
 					type='password'
 					name='password'
-					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
+					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryBlue focus:outline-none'
 					placeholder='Password'
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
@@ -69,7 +69,7 @@ const SignUpForm: React.FC = () => {
 					id='confirmPassword'
 					type='password'
 					name='confirmPassword'
-					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
+					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryBlue focus:outline-none'
 					placeholder='Confirm Password'
 					value={confirmPassword}
 					onChange={(e) => setConfirmPassword(e.target.value)}

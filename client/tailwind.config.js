@@ -10,22 +10,17 @@ module.exports = {
 		},
 		extend: {
 			colors: {
-				primaryRed: '#C41D33',
-				primaryRedHover: '#c41b20',
-				primaryRedActive: '#991519',
-				primaryRedActiveRoute: '#e14b50',
-				primaryBrown: '#1e1415',
-				footerButtonHover: '#241416'
+				primaryBlue: '#117FFF',
+				primaryBlueHover: '#0065d8',
+				primaryBlueActive: '#0058bd',
+				primaryBlueDisabled: '#6fb2ff'
+				// primaryBlueActiveRoute: '#e14b50',
 			},
 			borderWidth: {
 				1: '1px'
 			},
 			width: {
 				64: '16rem'
-			},
-			backgroundImage: {
-				'hero-pattern': "url('/imgs/Hero.png')",
-				'menu-background': "url('/imgs/MenuBackground.jpg')"
 			}
 		}
 	},

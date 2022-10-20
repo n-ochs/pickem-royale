@@ -15,7 +15,7 @@ async function bootstrap(): Promise<void> {
 	app.useGlobalPipes(new ValidationPipe());
 	app.enableCors({
 		methods: '*',
-		origin: 'http://localhost:3000',
+		origin: process.env.ENVIRONMENT === 'dev' ? 'http://localhost:3000' : 'https://pickemroyale.com',
 		exposedHeaders: '*',
 		credentials: true
 	});
@@ -25,7 +25,7 @@ async function bootstrap(): Promise<void> {
 	await prismaService.enableShutdownHooks(app);
 
 	// Listen
-	await app.listen(process.env.PORT || 8081);
+	await app.listen(process.env.PORT || 8080);
 }
 
 bootstrap();

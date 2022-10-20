@@ -33,7 +33,7 @@ const SignInForm: React.FC = () => {
 					id='email'
 					name='email'
 					type='text'
-					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
+					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryBlue focus:outline-none'
 					placeholder='Email address'
 					value={email}
 					ref={emailInputRef}
@@ -48,7 +48,7 @@ const SignInForm: React.FC = () => {
 					id='password'
 					type='password'
 					name='password'
-					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryRed focus:outline-none'
+					className='peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-primaryBlue focus:outline-none'
 					placeholder='Password'
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
@@ -58,7 +58,7 @@ const SignInForm: React.FC = () => {
 				</label>
 			</div>
 
-			<button className='btn-primary w-full text-center normal-case' type='submit'>
+			<button className='btn-primary w-full text-center normal-case' type='submit' disabled={email === '' || password === ''}>
 				Sign In
 			</button>
 		</form>

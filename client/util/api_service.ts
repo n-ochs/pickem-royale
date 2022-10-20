@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const APIService: AxiosInstance = axios.create({
-	baseURL: 'http://localhost:8080/api',
+	baseURL: `${process.env.NEXT_PUBLIC_ENVIRONMENT === 'dev' ? 'http://localhost:8080' : 'https://pickemroyale.com'}/api`,
 	withCredentials: true
 });
 

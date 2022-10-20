@@ -20,15 +20,15 @@ a {
 
 @layer components {
 	.btn-primary {
-		@apply inline-block rounded bg-primaryRed px-6 py-2.5 text-base font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-primaryRedHover hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primaryRedActive active:shadow-lg;
+		@apply inline-block rounded bg-primaryBlue px-6 py-2.5 text-base font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-primaryBlueHover hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:bg-primaryBlueActive active:shadow-lg disabled:bg-primaryBlueDisabled;
 	}
 
 	.btn-outlined {
-		@apply inline-block rounded border-1 border-solid border-primaryRed bg-white px-4 py-2 text-base font-medium uppercase leading-tight text-primaryRed shadow-md transition duration-150 ease-in-out hover:bg-gray-200 hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-300 active:shadow-lg;
+		@apply inline-block rounded border-1 border-solid border-primaryBlue bg-white px-4 py-2 text-base font-medium uppercase leading-tight text-primaryBlue shadow-md transition duration-150 ease-in-out hover:bg-gray-200 hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-300 active:shadow-lg;
 	}
 
 	.navbar-item {
-		@apply flex min-w-[68px] transform items-center justify-center rounded-3xl border-2 border-solid border-primaryRed px-3 py-2 font-medium text-white transition-all duration-300 hover:rounded-3xl hover:border-2 hover:border-solid hover:border-gray-300;
+		@apply flex min-w-[68px] transform items-center justify-center rounded-3xl border-2 border-solid border-primaryBlue px-3 py-2 font-medium text-white transition-all duration-300 hover:rounded-3xl hover:border-2 hover:border-solid hover:border-gray-300;
 	}
 
 	.auth-input {
