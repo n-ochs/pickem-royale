@@ -14,7 +14,7 @@ const Home: NextPage = () => {
 	};
 
 	return (
-		<div className='space-x-4'>
+		<div className='space-x-4 index-bg h-[974px]'>
 			<Link href='/signin'>
 				<a>Sign In</a>
 			</Link>
