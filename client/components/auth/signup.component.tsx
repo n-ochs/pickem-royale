@@ -2,7 +2,7 @@ import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import APIService from '@util/api_service';
+import { signUp } from '@util/api/auth.service';
 
 const SignUpForm: React.FC = () => {
 	const router: NextRouter = useRouter();
@@ -20,10 +20,11 @@ const SignUpForm: React.FC = () => {
 
 		e.preventDefault();
 		try {
-			await APIService.post('/auth/signup', { email, password }, { headers: { 'Content-Type': 'application/json' } });
+			await signUp(email, password);
 			router.push('/');
 			toast.success('Successfully created account and signed in.');
 		} catch (error) {
+			toast.error('Something went wrong. Please try again.', { duration: 7000 });
 			setEmail('');
 			setPassword('');
 			setConfirmPassword('');

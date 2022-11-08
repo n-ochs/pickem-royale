@@ -2,7 +2,7 @@ import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import APIService from '@util/api_service';
+import { signIn } from '@util/api/auth.service';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
@@ -14,7 +14,7 @@ const SignInForm: React.FC = () => {
 	const handleSignIn: (e: FormEvent) => void = async (e: FormEvent) => {
 		e.preventDefault();
 		try {
-			await APIService.post('/auth/signin', { email, password }, { headers: { 'Content-Type': 'application/json' } });
+			await signIn(email, password);
 			router.push('/');
 			toast.success('Successfully logged in.');
 		} catch (error) {
