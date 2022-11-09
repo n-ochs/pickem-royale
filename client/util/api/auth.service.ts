@@ -13,5 +13,5 @@ export const signUp: (email: string, password: string) => Promise<void> = async 
 };
 
 export const signOut: () => Promise<void> = async () => {
-	return APIService.post('/auth/signout', null, { withCredentials: true });
+	return APIService.post('/auth/signout', null);
 };
