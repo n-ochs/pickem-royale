@@ -3,25 +3,24 @@ import { NextRouter, useRouter } from 'next/router';
 import React from 'react';
 import toast from 'react-hot-toast';
 
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAuthenticated, signOut } from '@util/api/auth.service';
 
 const Navigation: React.FC = () => {
 	const router: NextRouter = useRouter();
 	const queryClient: QueryClient = useQueryClient();
-	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
 
-	const handleSignOut: () => Promise<void> = async () => {
-		try {
-			await signOut();
+	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
+	const { mutate: handleSignOut } = useMutation(signOut, {
+		onSuccess: () => {
 			router.push('/');
 			toast.success('Successfully signed out.');
-		} catch (error) {
-			toast.error('Something went wrong. Please try again.', { duration: 7000 });
-		} finally {
 			queryClient.invalidateQueries({ queryKey: ['isAuthenticated'] });
+		},
+		onError: () => {
+			toast.error('Something went wrong. Please try again.', { duration: 7000 });
 		}
-	};
+	});
 
 	return (
 		<nav className='flex items-center justify-between'>
@@ -43,7 +42,7 @@ const Navigation: React.FC = () => {
 				{!isLoading && (
 					<>
 						{isSuccess ? (
-							<button onClick={handleSignOut}>
+							<button onClick={() => handleSignOut()}>
 								<li className='navbar-item'>Sign Out</li>
 							</button>
 						) : (
