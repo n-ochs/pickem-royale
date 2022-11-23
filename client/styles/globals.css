@@ -28,7 +28,7 @@ a {
 	}
 
 	.navbar-item {
-		@apply flex min-w-[68px] transform items-center justify-center rounded-3xl border-2 border-solid border-primaryBlue px-3 py-2 font-medium text-white transition-all duration-300 hover:rounded-3xl hover:border-2 hover:border-solid hover:border-gray-300;
+		@apply flex min-w-[68px] transform items-center justify-center rounded-3xl border-2 border-solid border-transparent px-3 py-2 font-medium text-white transition-all duration-300 hover:rounded-3xl hover:border-2 hover:border-solid hover:border-gray-300;
 	}
 
 	.auth-input {

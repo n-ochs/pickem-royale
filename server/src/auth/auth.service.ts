@@ -14,6 +14,10 @@ import { PrismaService } from '@prismaModule/prisma.service';
 export class AuthService {
 	constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
+	async isAuthenticated(): Promise<void> {
+		return;
+	}
+
 	async getTokens(userId: number, email: string): Promise<Tokens> {
 		const jwtPayload: JwtPayload = {
 			sub: userId,
@@ -69,17 +73,13 @@ export class AuthService {
 		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
-			REFRESH_TOKEN,
-			tokens.refreshToken,
-			{
-				httpOnly: true,
-				secure: true,
-				expires: refreshTokenExp,
-				sameSite: true,
-				path: '/'
-			}
-		);
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
+			httpOnly: true,
+			secure: true,
+			expires: refreshTokenExp,
+			sameSite: true,
+			path: '/'
+		});
 	}
 
 	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
@@ -102,17 +102,13 @@ export class AuthService {
 		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
-			REFRESH_TOKEN,
-			tokens.refreshToken,
-			{
-				httpOnly: true,
-				secure: true,
-				expires: refreshTokenExp,
-				sameSite: true,
-				path: '/'
-			}
-		);
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
+			httpOnly: true,
+			secure: true,
+			expires: refreshTokenExp,
+			sameSite: true,
+			path: '/'
+		});
 	}
 
 	async signOut(userId: number, @Response({ passthrough: true }) res: Res): Promise<void> {
@@ -151,16 +147,12 @@ export class AuthService {
 		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(
-			REFRESH_TOKEN,
-			tokens.refreshToken,
-			{
-				httpOnly: true,
-				secure: true,
-				expires: refreshTokenExp,
-				sameSite: true,
-				path: '/'
-			}
-		);
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
+			httpOnly: true,
+			secure: true,
+			expires: refreshTokenExp,
+			sameSite: true,
+			path: '/'
+		});
 	}
 }

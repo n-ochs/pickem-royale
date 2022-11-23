@@ -1,34 +1,40 @@
+import { AxiosError } from 'axios';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import APIService from '@util/api_service';
+import { useMutation } from '@tanstack/react-query';
+import { signUp } from '@util/api/auth.service';
 
 const SignUpForm: React.FC = () => {
 	const router: NextRouter = useRouter();
 	const emailInputRef: React.MutableRefObject<HTMLInputElement> = useRef(null);
-
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-	const handleSignUp: (e: FormEvent) => void = async (e: FormEvent) => {
+	const { mutate } = useMutation(signUp, {
+		onSuccess: () => {
+			router.push('/');
+			toast.success('Successfully created account and signed in.');
+		},
+		onError: (error: AxiosError<{ message: string[] }, any>) => {
+			toast.error(error?.response?.data?.message?.[0] || 'Something went wrong. Please try again or contact support.', { duration: 7000 });
+			setEmail('');
+			setPassword('');
+			setConfirmPassword('');
+			emailInputRef.current.focus();
+		}
+	});
+
+	const handleSignUp: (e: FormEvent) => void = (e: FormEvent) => {
 		if (password !== confirmPassword) {
 			toast.error('Passwords do not match.');
 			return;
 		}
 
 		e.preventDefault();
-		try {
-			await APIService.post('/auth/signup', { email, password }, { headers: { 'Content-Type': 'application/json' } });
-			router.push('/');
-			toast.success('Successfully created account and signed in.');
-		} catch (error) {
-			setEmail('');
-			setPassword('');
-			setConfirmPassword('');
-			emailInputRef.current.focus();
-		}
+		mutate({ email, password });
 	};
 
 	return (
@@ -79,7 +85,11 @@ const SignUpForm: React.FC = () => {
 				</label>
 			</div>
 
-			<button className='btn-primary w-full text-center normal-case' type='submit' disabled={password === '' || confirmPassword === '' || password !== confirmPassword}>
+			<button
+				className='btn-primary w-full text-center normal-case'
+				type='submit'
+				disabled={email === '' || password === '' || confirmPassword === '' || password !== confirmPassword}
+			>
 				Sign Up
 			</button>
 		</form>
