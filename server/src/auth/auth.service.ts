@@ -5,7 +5,7 @@ import { Response as Res } from 'express';
 import { AuthDto } from '@auth/dto';
 import { JwtPayload, Tokens as Tokens } from '@auth/types';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@common/constants';
-import { ForbiddenException, Injectable, Response } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Response } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
@@ -58,28 +58,32 @@ export class AuthService {
 		// Hash password
 		const hashedPassword: string = await argon.hash(dto.password);
 
-		// Create user in DB
-		const newUser: User = await this.prisma.user.create({
-			data: {
-				email: dto.email,
-				hash: hashedPassword
-			}
-		});
+		try {
+			// Create user in DB
+			const newUser: User = await this.prisma.user.create({
+				data: {
+					email: dto.email,
+					hash: hashedPassword
+				}
+			});
 
-		// Generate Tokens
-		const tokens: Tokens = await this.getTokens(newUser.id, newUser.email);
-		await this.updateRtHash(newUser.id, tokens.refreshToken);
-		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
-		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
+			// Generate Tokens
+			const tokens: Tokens = await this.getTokens(newUser.id, newUser.email);
+			await this.updateRtHash(newUser.id, tokens.refreshToken);
+			const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
+			const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
-		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
-			httpOnly: true,
-			secure: true,
-			expires: refreshTokenExp,
-			sameSite: true,
-			path: '/'
-		});
+			// Send response with cookies
+			res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
+				httpOnly: true,
+				secure: true,
+				expires: refreshTokenExp,
+				sameSite: true,
+				path: '/'
+			});
+		} catch (error) {
+			throw new BadRequestException('Problem creating user account. User with email may already exist. Please try again or contact support.');
+		}
 	}
 
 	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {

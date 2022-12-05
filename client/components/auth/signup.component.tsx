@@ -18,8 +18,8 @@ const SignUpForm: React.FC = () => {
 			router.push('/');
 			toast.success('Successfully created account and signed in.');
 		},
-		onError: (error: AxiosError<{ message: string[] }, any>) => {
-			toast.error(error?.response?.data?.message?.[0] || 'Something went wrong. Please try again or contact support.', { duration: 7000 });
+		onError: (error: AxiosError<{ message: string }, any>) => {
+			toast.error(error?.response?.data?.message || 'Something went wrong. Please try again or contact support.', { duration: 7000 });
 			setEmail('');
 			setPassword('');
 			setConfirmPassword('');

@@ -15,7 +15,7 @@ const SignInForm: React.FC = () => {
 	const { mutate } = useMutation(signIn, {
 		onSuccess: () => {
 			router.push('/');
-			toast.success('Successfully logged in.');
+			toast.success('Welcome back!');
 		},
 		onError: (error: AxiosError) => {
 			toast.error(error.response?.status === 403 ? 'Incorrect username or password. Please try again.' : 'Error: Please contact support.');
