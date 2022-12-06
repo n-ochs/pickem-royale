@@ -11,6 +11,7 @@ const Navigation: React.FC = () => {
 	const queryClient: QueryClient = useQueryClient();
 
 	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
+
 	const { mutate: handleSignOut } = useMutation(signOut, {
 		onSuccess: () => {
 			router.push('/');
