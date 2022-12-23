@@ -7,7 +7,7 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 async function bootstrap(): Promise<void> {
 	// Create App
-	const app: INestApplication = await NestFactory.create(AppModule);
+	const app: INestApplication = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
 
 	// Set Globals
 	app.setGlobalPrefix('/api');

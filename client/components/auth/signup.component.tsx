@@ -30,12 +30,13 @@ const SignUpForm: React.FC = () => {
 	});
 
 	const handleSignUp: (e: FormEvent) => void = (e: FormEvent) => {
+		e.preventDefault();
+
 		if (password !== confirmPassword) {
 			toast.error('Passwords do not match.');
 			return;
 		}
 
-		e.preventDefault();
 		toast.loading('Creating account...');
 		mutate({ email, password });
 	};
