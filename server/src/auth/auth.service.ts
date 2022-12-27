@@ -12,7 +12,8 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class AuthService {
-	private logger = new Logger(AuthService.name);
+	private logger: Logger = new Logger(AuthService.name);
+
 	constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
 	async isAuthenticated(): Promise<void> {
