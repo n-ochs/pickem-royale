@@ -1,28 +1,36 @@
+import { AxiosError } from 'axios';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import APIService from '@util/api_service';
+import { useMutation } from '@tanstack/react-query';
+import { signIn } from '@util/api/auth.service';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
 	const emailInputRef: React.MutableRefObject<HTMLInputElement> = useRef(null);
-
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
-	const handleSignIn: (e: FormEvent) => void = async (e: FormEvent) => {
-		e.preventDefault();
-		try {
-			await APIService.post('/auth/signin', { email, password }, { headers: { 'Content-Type': 'application/json' } });
+	const { mutate } = useMutation(signIn, {
+		onSuccess: () => {
+			toast.dismiss();
 			router.push('/');
-			toast.success('Successfully logged in.');
-		} catch (error) {
+			toast.success('Welcome back!');
+		},
+		onError: (error: AxiosError) => {
+			toast.dismiss();
 			toast.error(error.response?.status === 403 ? 'Incorrect username or password. Please try again.' : 'Error: Please contact support.');
 			setEmail('');
 			setPassword('');
 			emailInputRef.current.focus();
 		}
+	});
+
+	const handleSignIn: (e: FormEvent) => void = (e: FormEvent) => {
+		e.preventDefault();
+		toast.loading('Signing in...');
+		mutate({ email, password });
 	};
 
 	return (

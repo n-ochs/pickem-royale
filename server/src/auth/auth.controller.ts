@@ -5,11 +5,16 @@ import { AuthDto } from '@auth/dto';
 import { REFRESH_TOKEN } from '@common/constants';
 import { GetCurrentUser, GetCurrentUserId, Public } from '@common/decorators';
 import { RtGuard } from '@common/guards';
-import { Body, Controller, HttpCode, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
 	constructor(private authService: AuthService) {}
+
+	@Get()
+	async isAuthenticated(): Promise<void> {
+		return this.authService.isAuthenticated();
+	}
 
 	@Public()
 	@Post('signup')
