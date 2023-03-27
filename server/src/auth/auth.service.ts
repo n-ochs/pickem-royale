@@ -16,11 +16,16 @@ export class AuthService {
 
 	constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-	async isAuthenticated(): Promise<void> {
-		return;
-	}
-
-	async getTokens(userId: number, email: string): Promise<Tokens> {
+	/**
+	 * Generates JWT tokens - access & refresh
+	 *
+	 * @private
+	 * @param {number} userId
+	 * @param {string} email
+	 * @return {*}  {Promise<Tokens>}
+	 * @memberof AuthService
+	 */
+	private async getTokens(userId: number, email: string): Promise<Tokens> {
 		this.logger.verbose(`Generating JWTs for user with email: '${email}'`);
 
 		const jwtPayload: JwtPayload = {
@@ -47,7 +52,16 @@ export class AuthService {
 		};
 	}
 
-	async updateRtHash(userId: number, rt: string): Promise<void> {
+	/**
+	 * Hashes refresh token and stores in DB user record
+	 *
+	 * @private
+	 * @param {number} userId
+	 * @param {string} rt
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
+	private async updateRtHash(userId: number, rt: string): Promise<void> {
 		this.logger.verbose(`Updating RT hash for user ID: '${userId}'`);
 
 		const hash: string = await argon.hash(rt);
@@ -64,6 +78,24 @@ export class AuthService {
 		this.logger.verbose(`Successfully updated RT hash in DB for user ID: '${userId}'`);
 	}
 
+	/**
+	 * Quick check to see if user is authenticated
+	 *
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
+	async isAuthenticated(): Promise<void> {
+		return;
+	}
+
+	/**
+	 * Allows users to sign up with email & password
+	 *
+	 * @param {AuthDto} dto
+	 * @param {Res} res
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
 	async signUp(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
 		this.logger.verbose(`Creating user account for user with email '${dto.email}'`);
 
@@ -101,6 +133,14 @@ export class AuthService {
 		}
 	}
 
+	/**
+	 * Allows users to sign in with email & password. Sends JWT cookies as response
+	 *
+	 * @param {AuthDto} dto
+	 * @param {Res} res
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
 	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
 		this.logger.verbose(`Signing in user with email: '${dto.email}'`);
 		// Find user
@@ -139,6 +179,14 @@ export class AuthService {
 		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`);
 	}
 
+	/**
+	 * Allows users to sign out
+	 *
+	 * @param {number} userId
+	 * @param {Res} res
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
 	async signOut(userId: number, @Response({ passthrough: true }) res: Res): Promise<void> {
 		this.logger.verbose(`Signing out user with user ID: '${userId}'`);
 
@@ -158,6 +206,15 @@ export class AuthService {
 		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`);
 	}
 
+	/**
+	 * Refreshes JWT tokens - access & refresh
+	 *
+	 * @param {number} userId
+	 * @param {string} rt
+	 * @param {Res} res
+	 * @return {*}  {Promise<void>}
+	 * @memberof AuthService
+	 */
 	async refreshTokens(userId: number, rt: string, @Response({ passthrough: true }) res: Res): Promise<void> {
 		this.logger.verbose(`Refreshing tokens for user with user ID: '${userId}'`);
 

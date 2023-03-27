@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const APIService: AxiosInstance = axios.create({
-	baseURL: `${process.env.NEXT_PUBLIC_ENVIRONMENT === 'dev' ? 'http://localhost:8080' : 'https://pickemroyale.com'}/api`,
+	baseURL: `${process.env.NEXT_PUBLIC_BASEURL}/api`,
 	withCredentials: true
 });
 
@@ -16,14 +16,7 @@ APIService.interceptors.response.use(
 
 		if (error?.response?.status === 401) {
 			await APIService.post('/auth/refresh', null);
-			switch (error?.config?.method) {
-				case 'get':
-					return APIService.get(`${error?.config?.baseURL}${error?.config?.url}`);
-				case 'post':
-					return APIService.post(`${error?.config?.baseURL}${error?.config?.url}`, JSON.parse(error?.config?.data));
-				default:
-					break;
-			}
+			return APIService(error?.config);
 		}
 		return Promise.reject(error);
 	}
