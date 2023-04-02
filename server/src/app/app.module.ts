@@ -1,6 +1,6 @@
 import { AuthModule } from '@auth/auth.module';
 import { AtGuard } from '@common/guards';
-import { RequestLoggerMiddleware } from '@common/middleware/request_logger.middleware';
+import { RequestLoggerMiddleware } from '@common/middleware';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from '@prismaModule/prisma.module';

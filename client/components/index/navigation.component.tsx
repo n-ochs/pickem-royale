@@ -4,7 +4,7 @@ import React from 'react';
 import toast from 'react-hot-toast';
 
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { isAuthenticated, signOut } from '@util/api/auth.service';
+import { isAuthenticated, signOut } from '@util/api';
 
 const Navigation: React.FC = () => {
 	const router: NextRouter = useRouter();

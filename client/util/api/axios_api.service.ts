@@ -7,6 +7,7 @@ const APIService: AxiosInstance = axios.create({
 
 APIService.interceptors.response.use(
 	(response) => {
+		// response?.data = response?.data?.data;
 		return response;
 	},
 	async (error) => {
