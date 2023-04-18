@@ -23,4 +23,4 @@ APIService.interceptors.response.use(
 	}
 );
 
-export default APIService;
+export { APIService };

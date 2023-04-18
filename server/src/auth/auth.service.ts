@@ -33,7 +33,7 @@ export class AuthService {
 			email: email
 		};
 
-		const [at, rt] = await Promise.all([
+		const [at, rt]: string[] = await Promise.all([
 			this.jwtService.signAsync(jwtPayload, {
 				secret: process.env.AT_SECRET,
 				expiresIn: '15m'
@@ -168,15 +168,12 @@ export class AuthService {
 		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
-			httpOnly: true,
-			secure: true,
-			expires: refreshTokenExp,
-			sameSite: true,
-			path: '/'
-		});
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		res.end();
 
 		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`);
+		return;
 	}
 
 	/**
@@ -201,9 +198,12 @@ export class AuthService {
 				hashedRt: null
 			}
 		});
-		res.clearCookie(ACCESS_TOKEN).clearCookie(REFRESH_TOKEN);
+		res.clearCookie(ACCESS_TOKEN);
+		res.clearCookie(REFRESH_TOKEN);
+		res.end();
 
 		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`);
+		return;
 	}
 
 	/**
@@ -244,14 +244,11 @@ export class AuthService {
 		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
-			httpOnly: true,
-			secure: true,
-			expires: refreshTokenExp,
-			sameSite: true,
-			path: '/'
-		});
+		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		res.end();
 
 		this.logger.verbose(`Successfully refreshed token for user with user ID: '${userId}'`);
+		return;
 	}
 }

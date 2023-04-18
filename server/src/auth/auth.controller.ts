@@ -12,6 +12,7 @@ export class AuthController {
 	constructor(private authService: AuthService) {}
 
 	@Get()
+	@HttpCode(HttpStatus.OK)
 	async isAuthenticated(): Promise<void> {
 		return this.authService.isAuthenticated();
 	}
