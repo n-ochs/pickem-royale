@@ -4,7 +4,7 @@ import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useMutation } from '@tanstack/react-query';
-import { signIn } from '@util/api/auth.service';
+import { signIn } from '@util/api';
 
 const SignInForm: React.FC = () => {
 	const router: NextRouter = useRouter();
@@ -34,7 +34,7 @@ const SignInForm: React.FC = () => {
 	};
 
 	return (
-		<form className='w-80 space-y-8 rounded-xl border-1 border-solid border-gray-300 bg-white px-10 pt-4 pb-8 shadow-lg' onSubmit={handleSignIn}>
+		<form className='w-80 space-y-8 rounded-xl border-1 border-solid border-gray-300 bg-white px-10 pb-8 pt-4 shadow-lg' onSubmit={handleSignIn}>
 			<h2 className='text-2xl font-semibold text-gray-900'>Sign In</h2>
 			<div className='relative'>
 				<input

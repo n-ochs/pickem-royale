@@ -77,3 +77,5 @@ server/!.vscode/settings.json
 server/!.vscode/tasks.json
 server/!.vscode/launch.json
 server/!.vscode/extensions.json
+.vscode/
+.vscode/*
