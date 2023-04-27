@@ -21,6 +21,7 @@
 			"@auth/*": ["src/auth/*"],
 			"@app/*": ["src/app/*"],
 			"@common/*": ["src/common/*"],
+			"@league/*": ["src/league/*"],
 			"@prismaModule/*": ["src/prisma/*"]
 		}
 	}

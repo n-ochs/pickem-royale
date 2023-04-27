@@ -32,7 +32,7 @@ async function bootstrap(): Promise<void> {
 
 	/* --------------------------------- Listen --------------------------------- */
 	await app.listen(process.env.PORT);
-	logger.log(`Application listening on port ${process.env.PORT}`);
+	logger.log(`Application listening on port ${process.env.PORT} 🚀`);
 }
 
 bootstrap();
