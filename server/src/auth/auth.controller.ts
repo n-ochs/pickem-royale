@@ -9,7 +9,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards 
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private readonly authService: AuthService) {}
 
 	@Get()
 	@HttpCode(HttpStatus.OK)

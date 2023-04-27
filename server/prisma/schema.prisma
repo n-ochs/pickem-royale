@@ -8,14 +8,39 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email    String  @unique
+  email    String    @unique
   hash     String
   hashedRt String?
   @@map("users")
+}
+
+model League {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy Int
+  updatedBy Int?
+  name      String   @db.VarChar(30)
+  ownerId   Int
+  isPublic  Boolean
+  sportId   Int
+  sport StdSport @relation(fields: [sportId], references: [id])
+  leagueType Int
+  @@map("leagues")
+  @@index([sportId])
+}
+
+model StdSport {
+  id  Int @id @default(autoincrement())
+  abbreviation String @db.VarChar(3) @unique
+  adn String @db.VarChar(50) @unique
+  leagues League[]
+  @@map("std_sport")
 }

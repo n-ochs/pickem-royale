@@ -1,13 +1,20 @@
 import axios, { AxiosInstance } from 'axios';
+import { nanoid } from 'nanoid';
 
 const APIService: AxiosInstance = axios.create({
 	baseURL: `${process.env.NEXT_PUBLIC_BASEURL}/api`,
 	withCredentials: true
 });
 
+APIService.interceptors.request.use((config) => {
+	// eslint-disable-next-line camelcase
+	config.headers.request_id = nanoid();
+	return config;
+});
+
 APIService.interceptors.response.use(
 	(response) => {
-		// response?.data = response?.data?.data;
+		response.data = response?.data?.data;
 		return response;
 	},
 	async (error) => {

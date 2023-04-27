@@ -12,9 +12,9 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class AuthService {
-	private logger: Logger = new Logger(AuthService.name);
+	private readonly logger: Logger = new Logger(AuthService.name);
 
-	constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+	constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
 
 	/**
 	 * Generates JWT tokens - access & refresh
@@ -118,19 +118,16 @@ export class AuthService {
 			const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
 
 			// Send response with cookies
-			res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' }).cookie(REFRESH_TOKEN, tokens.refreshToken, {
-				httpOnly: true,
-				secure: true,
-				expires: refreshTokenExp,
-				sameSite: true,
-				path: '/'
-			});
+			res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' });
+			res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/' });
 
 			this.logger.verbose(`Successfully created user account and signed in user with email: '${dto.email}'`);
 		} catch (error) {
 			this.logger.error(`Problem creating user account for user with email: '${dto.email}'. User with email may already exist`);
 			throw new BadRequestException('Problem creating user account. User with email may already exist. Please try again or contact support.');
 		}
+
+		return;
 	}
 
 	/**
@@ -170,7 +167,6 @@ export class AuthService {
 		// Send response with cookies
 		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
 		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
-		res.end();
 
 		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`);
 		return;
@@ -200,7 +196,6 @@ export class AuthService {
 		});
 		res.clearCookie(ACCESS_TOKEN);
 		res.clearCookie(REFRESH_TOKEN);
-		res.end();
 
 		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`);
 		return;
@@ -246,7 +241,6 @@ export class AuthService {
 		// Send response with cookies
 		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
 		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
-		res.end();
 
 		this.logger.verbose(`Successfully refreshed token for user with user ID: '${userId}'`);
 		return;
