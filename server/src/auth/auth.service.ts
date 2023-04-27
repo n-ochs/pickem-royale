@@ -12,9 +12,9 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class AuthService {
-	private logger: Logger = new Logger(AuthService.name);
+	private readonly logger: Logger = new Logger(AuthService.name);
 
-	constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+	constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
 
 	/**
 	 * Generates JWT tokens - access & refresh

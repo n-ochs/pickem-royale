@@ -5,7 +5,7 @@ import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
-	private logger = new Logger('HTTP');
+	private readonly logger: Logger = new Logger('HTTP');
 
 	use(request: Request, response: Response, next: NextFunction): void {
 		const { ip, method } = request;
