@@ -1,4 +1,4 @@
-import { LeagueDto } from '@league/dto';
+import { CreateLeagueDto } from '@league/dto';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { League } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
@@ -12,12 +12,12 @@ export class LeagueService {
 	/**
 	 * Creates a new league
 	 *
-	 * @param {LeagueDto} dto
+	 * @param {CreateLeagueDto} dto
 	 * @param {number} userId
 	 * @return {*}  {Promise<void>}
 	 * @memberof LeagueService
 	 */
-	async create(dto: LeagueDto, userId: number): Promise<void> {
+	async create(dto: CreateLeagueDto, userId: number): Promise<void> {
 		this.logger.verbose(`Creating league '${dto.name}' for userId ${userId}`);
 
 		try {
@@ -28,7 +28,7 @@ export class LeagueService {
 					createdBy: userId,
 					isPublic: dto.isPublic,
 					sportId: dto.sportId,
-					leagueType: dto.leagueType
+					leagueTypeId: dto.leagueTypeId
 				}
 			});
 			this.logger.verbose(`Successfully created league '${dto.name}' for userId ${userId}`);
@@ -47,7 +47,7 @@ export class LeagueService {
 	 * @return {*}  {Promise<League>}
 	 * @memberof LeagueService
 	 */
-	async getOne(leagueId: number): Promise<League> {
+	async findOne(leagueId: number): Promise<League> {
 		this.logger.verbose(`Getting league data for leagueId '${leagueId}'`);
 
 		// make sure user belongs to league or has certain privs or league is public. maybe make this a separate function
@@ -57,7 +57,8 @@ export class LeagueService {
 				id: leagueId
 			},
 			include: {
-				sport: true
+				sport: true,
+				leagueType: true
 			}
 		});
 
@@ -77,7 +78,7 @@ export class LeagueService {
 	 * @return {*}  {Promise<League[]>}
 	 * @memberof LeagueService
 	 */
-	async getMany(leagueIds: number[]): Promise<League[]> {
+	async findMany(leagueIds: number[]): Promise<League[]> {
 		this.logger.verbose(`Getting league data for leagueIds '${leagueIds}'`);
 
 		// make sure user belongs to league or has certain privs or league is public. maybe make this a separate function
@@ -87,7 +88,8 @@ export class LeagueService {
 				id: { in: leagueIds }
 			},
 			include: {
-				sport: true
+				sport: true,
+				leagueType: true
 			}
 		});
 
@@ -97,6 +99,29 @@ export class LeagueService {
 		}
 
 		this.logger.verbose(`Successfully retreived league data for leagueIds '${leagueIds}'`);
+		return leagues;
+	}
+
+	/**
+	 * Retreives all league data from DB
+	 *
+	 * @param {boolean} isPublic
+	 * @return {*}  {Promise<League[]>}
+	 * @memberof LeagueService
+	 */
+	async findAll(isPublic: boolean): Promise<League[]> {
+		this.logger.verbose('Getting all league data');
+
+		// check privileges
+
+		const leagues: League[] = await this.prisma.league.findMany({ where: { isPublic }, include: { sport: true, leagueType: true } });
+
+		if (!leagues || leagues?.length < 1) {
+			this.logger.error('Problem getting league data');
+			throw new NotFoundException('Problem getting league data.');
+		}
+
+		this.logger.verbose('Successfully retreived all league data');
 		return leagues;
 	}
 }

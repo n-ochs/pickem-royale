@@ -22,7 +22,8 @@
 			"@app/*": ["src/app/*"],
 			"@common/*": ["src/common/*"],
 			"@league/*": ["src/league/*"],
-			"@prismaModule/*": ["src/prisma/*"]
+			"@prismaModule/*": ["src/prisma/*"],
+			"@std/*": ["src/std/*"]
 		}
 	}
 }
