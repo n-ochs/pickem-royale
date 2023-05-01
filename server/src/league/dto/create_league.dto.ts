@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class LeagueDto {
+export class CreateLeagueDto {
 	@IsNotEmpty()
 	@IsString()
 	@MaxLength(30)
@@ -20,5 +20,5 @@ export class LeagueDto {
 
 	@IsNotEmpty()
 	@IsNumber()
-	leagueType: number;
+	leagueTypeId: number;
 }

@@ -32,15 +32,27 @@ model League {
   isPublic  Boolean
   sportId   Int
   sport StdSport @relation(fields: [sportId], references: [id])
-  leagueType Int
+  leagueTypeId Int
+  leagueType StdLeagueType @relation(fields: [leagueTypeId], references: [id])
   @@map("leagues")
   @@index([sportId])
+  @@index([leagueTypeId])
 }
 
 model StdSport {
   id  Int @id @default(autoincrement())
-  abbreviation String @db.VarChar(3) @unique
-  adn String @db.VarChar(50) @unique
+  adn String @db.VarChar(3) @unique
+  name String @db.VarChar(50) @unique
+  description String? @db.VarChar(100)
   leagues League[]
   @@map("std_sport")
+}
+
+model StdLeagueType {
+  id  Int @id @default(autoincrement())
+  adn String @db.VarChar(25) @unique
+  name String @db.VarChar(50) @unique
+  description String? @db.VarChar(100)
+  leagues League[]
+  @@map("std_league_type")
 }

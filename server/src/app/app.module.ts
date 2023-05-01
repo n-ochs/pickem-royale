@@ -6,9 +6,10 @@ import { LeagueModule } from '@league/league.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from '@prismaModule/prisma.module';
+import { StdModule } from '@std/std.module';
 
 @Module({
-	imports: [AuthModule, LeagueModule, PrismaModule],
+	imports: [AuthModule, LeagueModule, PrismaModule, StdModule],
 	providers: [
 		{
 			provide: APP_GUARD,

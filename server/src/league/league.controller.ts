@@ -1,7 +1,7 @@
 import { GetCurrentUserId } from '@common/decorators';
-import { LeagueDto } from '@league/dto';
+import { CreateLeagueDto } from '@league/dto';
 import { LeagueService } from '@league/league.service';
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseArrayPipe, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseArrayPipe, ParseBoolPipe, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { League } from '@prisma/client';
 
 @Controller('league')
@@ -10,17 +10,22 @@ export class LeagueController {
 
 	@Post('create')
 	@HttpCode(HttpStatus.CREATED)
-	async create(@Body() dto: LeagueDto, @GetCurrentUserId() userId: number): Promise<void> {
+	async create(@Body() dto: CreateLeagueDto, @GetCurrentUserId() userId: number): Promise<void> {
 		return this.leagueService.create(dto, userId);
 	}
 
-	@Get(':leagueId')
-	async getOne(@Param('leagueId', ParseIntPipe) leagueId: number): Promise<League> {
-		return this.leagueService.getOne(leagueId);
+	@Get('all')
+	async findAll(@Query('p', ParseBoolPipe) isPublic: boolean): Promise<League[]> {
+		return this.leagueService.findAll(isPublic);
+	}
+
+	@Get(':id')
+	async findOne(@Param('id', ParseIntPipe) leagueId: number): Promise<League> {
+		return this.leagueService.findOne(leagueId);
 	}
 
 	@Get()
-	async getMany(@Query('ids', new ParseArrayPipe({ items: Number, separator: ',' })) leagueIds: number[]): Promise<League[]> {
-		return this.leagueService.getMany(leagueIds);
+	async findMany(@Query('ids', new ParseArrayPipe({ items: Number, separator: ',' })) leagueIds: number[]): Promise<League[]> {
+		return this.leagueService.findMany(leagueIds);
 	}
 }
