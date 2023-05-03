@@ -8,4 +8,5 @@ export const REFRESH_TOKEN: keyof JwtPayloadWithRt = 'refreshToken';
 
 export abstract class StdTables {
 	static readonly STD_SPORT = 'std_sport';
+	static readonly STD_LEAGUE_TYPE = 'std_league_type';
 }

@@ -1,22 +1,25 @@
 import { StdTables } from '@common/constants';
+import { StdTable } from '@common/models/std_table.model';
 import { Injectable, Logger } from '@nestjs/common';
-
-import { StdSportService } from './services/std_sport.service';
+import { StdLeagueTypeService, StdSportService } from '@std/services';
 
 @Injectable()
 export class StdService {
 	private readonly logger: Logger = new Logger(StdService.name);
 
-	constructor(private readonly stdSportService: StdSportService) {}
+	constructor(private readonly stdLeagueTypeService: StdLeagueTypeService, private readonly stdSportService: StdSportService) {}
 
 	/**
 	 * Finds all Std Tables in the DB
 	 *
-	 * @return {*}  {Promise<any[]>}
+	 * @return {*}  {Promise<{ name: string; data: StdTable[] }[]>}
 	 * @memberof StdService
 	 */
-	async findAll(): Promise<{ name: string; data: any[] }[]> {
+	async findAll(): Promise<{ name: string; data: StdTable[] }[]> {
 		this.logger.log('Getting all data from Std Tables');
-		return Promise.all([{ name: StdTables.STD_SPORT, data: await this.stdSportService.findAll() }]);
+		return Promise.all([
+			{ name: StdTables.STD_SPORT, data: await this.stdSportService.findAll() },
+			{ name: StdTables.STD_LEAGUE_TYPE, data: await this.stdLeagueTypeService.findAll() }
+		]);
 	}
 }
