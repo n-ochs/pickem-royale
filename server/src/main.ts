@@ -14,6 +14,7 @@ async function bootstrap(): Promise<void> {
 	/* ------------------------------- Create App ------------------------------- */
 	const app: INestApplication = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
 	const logger: Logger = new Logger();
+	logger.log('Logger initialized 📝');
 
 	/* ------------------------------- Set Globals ------------------------------ */
 	app.setGlobalPrefix('/api');
@@ -29,10 +30,11 @@ async function bootstrap(): Promise<void> {
 	/* ------------------------------ Enable Prisma ----------------------------- */
 	const prismaService: PrismaService = app.get(PrismaService);
 	await prismaService.enableShutdownHooks(app);
+	logger.log('Prisma ORM initialized 🔼 🔌');
 
 	/* --------------------------------- Listen --------------------------------- */
 	await app.listen(process.env.PORT);
-	logger.log(`Application listening on port ${process.env.PORT} 🚀`);
+	logger.log(`Application running on port ${process.env.PORT} 🚀`);
 }
 
 bootstrap();

@@ -11,6 +11,7 @@ export class AtStrategy extends PassportStrategy(Strategy, JWT) {
 	constructor() {
 		super({
 			jwtFromRequest: AtStrategy.extractAtJwtFromCookie,
+			ignoreExpiration: false,
 			secretOrKey: process.env.AT_SECRET
 		});
 	}
@@ -22,7 +23,8 @@ export class AtStrategy extends PassportStrategy(Strategy, JWT) {
 		return null;
 	}
 
-	// Validate JWT Signature
+	// Validate JWT Signature - Passport already handles this, so all we need to do is return the payload
+	// https://docs.nestjs.com/recipes/passport#implementing-passport-jwt
 	validate(payload: JwtPayload): JwtPayload {
 		return payload;
 	}

@@ -1,10 +1,10 @@
 import * as argon from 'argon2';
-import * as dayjs from 'dayjs';
 import { Response as Res } from 'express';
 
 import { AuthDto } from '@auth/dto';
 import { JwtPayload, Tokens as Tokens } from '@auth/types';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '@common/constants';
+import { ACCESS_TOKEN, MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN, REFRESH_TOKEN } from '@common/constants';
+import { TokenCookieOptions } from '@common/models';
 import { BadRequestException, ForbiddenException, Injectable, Logger, Response } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
@@ -17,6 +17,24 @@ export class AuthService {
 	constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
 
 	/**
+	 * Generates auth cookie options
+	 *
+	 * @private
+	 * @return {*}  {{ accessTokenCookieOptions: TokenCookieOptions; refreshTokenCookieOptions: TokenCookieOptions }}
+	 * @memberof AuthService
+	 */
+	private generateCookieOptions(): { accessTokenCookieOptions: TokenCookieOptions; refreshTokenCookieOptions: TokenCookieOptions } {
+		this.logger.verbose('Generating cookie options for auth JWT tokens');
+		const accessTokenCookieOptions: TokenCookieOptions = new TokenCookieOptions(null, MAX_AGE_ACCESS_TOKEN, process.env.DOMAIN, '/');
+
+		// We send the refresh token with a special path to ensure that the refresh token is only being passed on requests from a client to our refresh route on the server
+		const refreshTokenCookieOptions: TokenCookieOptions = new TokenCookieOptions(null, MAX_AGE_REFRESH_TOKEN, process.env.DOMAIN, '/api/auth/refresh');
+
+		this.logger.verbose('Successfully generated cookie options for auth JWT tokens');
+		return { accessTokenCookieOptions, refreshTokenCookieOptions };
+	}
+
+	/**
 	 * Generates JWT tokens - access & refresh
 	 *
 	 * @private
@@ -25,7 +43,7 @@ export class AuthService {
 	 * @return {*}  {Promise<Tokens>}
 	 * @memberof AuthService
 	 */
-	private async getTokens(userId: number, email: string): Promise<Tokens> {
+	private async generateTokens(userId: number, email: string): Promise<Tokens> {
 		this.logger.verbose(`Generating JWTs for user with email: '${email}'`);
 
 		const jwtPayload: JwtPayload = {
@@ -33,7 +51,7 @@ export class AuthService {
 			email: email
 		};
 
-		const [at, rt]: string[] = await Promise.all([
+		const [accessToken, refreshToken]: string[] = await Promise.all([
 			this.jwtService.signAsync(jwtPayload, {
 				secret: process.env.AT_SECRET,
 				expiresIn: '15m'
@@ -46,10 +64,7 @@ export class AuthService {
 
 		this.logger.verbose(`Successfully generated tokens for user with email: '${email}'`);
 
-		return {
-			accessToken: at,
-			refreshToken: rt
-		};
+		return { accessToken, refreshToken };
 	}
 
 	/**
@@ -112,14 +127,14 @@ export class AuthService {
 			});
 
 			// Generate Tokens
-			const tokens: Tokens = await this.getTokens(newUser.id, newUser.email);
-			await this.updateRtHash(newUser.id, tokens.refreshToken);
-			const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
-			const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
+			const { accessToken, refreshToken } = await this.generateTokens(newUser.id, newUser.email);
+			await this.updateRtHash(newUser.id, refreshToken);
 
-			// Send response with cookies
-			res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/' });
-			res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/' });
+			const { accessTokenCookieOptions, refreshTokenCookieOptions } = this.generateCookieOptions();
+
+			// Send response as cookies
+			res.cookie(ACCESS_TOKEN, accessToken, accessTokenCookieOptions);
+			res.cookie(REFRESH_TOKEN, refreshToken, refreshTokenCookieOptions);
 
 			this.logger.verbose(`Successfully created user account and signed in user with email: '${dto.email}'`);
 		} catch (error) {
@@ -159,14 +174,14 @@ export class AuthService {
 		}
 
 		// Generate Tokens
-		const tokens: Tokens = await this.getTokens(user.id, user.email);
-		await this.updateRtHash(user.id, tokens.refreshToken);
-		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
-		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
+		const { accessToken, refreshToken } = await this.generateTokens(user.id, user.email);
+		await this.updateRtHash(user.id, refreshToken);
 
-		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
-		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		const { accessTokenCookieOptions, refreshTokenCookieOptions } = this.generateCookieOptions();
+
+		// Send response as cookies
+		res.cookie(ACCESS_TOKEN, accessToken, accessTokenCookieOptions);
+		res.cookie(REFRESH_TOKEN, refreshToken, refreshTokenCookieOptions);
 
 		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`);
 		return;
@@ -195,7 +210,7 @@ export class AuthService {
 			}
 		});
 		res.clearCookie(ACCESS_TOKEN);
-		res.clearCookie(REFRESH_TOKEN);
+		res.clearCookie(REFRESH_TOKEN, { path: '/api/auth/refresh' });
 
 		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`);
 		return;
@@ -219,28 +234,46 @@ export class AuthService {
 				id: userId
 			}
 		});
-		if (!user || !user.hashedRt) {
+
+		if (!user) {
 			this.logger.error(`Problem finding user with user ID: '${userId}'`);
+			res.clearCookie(REFRESH_TOKEN, { path: '/api/auth/refresh' });
+			throw new ForbiddenException('Access Denied');
+		}
+
+		if (!user?.hashedRt) {
+			this.logger.error(`Hashed RT does not exist in DB for user ID: '${userId}'`);
+			res.clearCookie(REFRESH_TOKEN, { path: '/api/auth/refresh' });
 			throw new ForbiddenException('Access Denied');
 		}
 
 		// Verify refreshToken & hashedRt match
 		const rtMatches: boolean = await argon.verify(user.hashedRt, rt);
+
+		// If RT hash doesn't match, reset hashed RT in DB and clear cookie, throw error
 		if (!rtMatches) {
 			this.logger.error(`Request RT does not match DB hashed RT for user with user ID: '${userId}'`);
+			await this.prisma.user.update({
+				where: {
+					id: userId
+				},
+				data: {
+					hashedRt: null
+				}
+			});
+			res.clearCookie(REFRESH_TOKEN, { path: '/api/auth/refresh' });
 			throw new ForbiddenException('Access Denied');
 		}
 
 		// Generate Tokens
-		const tokens: Tokens = await this.getTokens(user.id, user.email);
-		await this.updateRtHash(user.id, tokens.refreshToken);
+		const { accessToken, refreshToken } = await this.generateTokens(user.id, user.email);
+		await this.updateRtHash(user.id, refreshToken);
 
-		const accessTokenExp: Date = dayjs().add(15, 'm').toDate();
-		const refreshTokenExp: Date = dayjs().add(2, 'h').toDate();
+		const { accessTokenCookieOptions, refreshTokenCookieOptions } = this.generateCookieOptions();
 
-		// Send response with cookies
-		res.cookie(ACCESS_TOKEN, tokens.accessToken, { httpOnly: true, secure: true, expires: accessTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
-		res.cookie(REFRESH_TOKEN, tokens.refreshToken, { httpOnly: true, secure: true, expires: refreshTokenExp, sameSite: true, path: '/', domain: process.env.DOMAIN });
+		// Send response as cookies
+		res.cookie(ACCESS_TOKEN, accessToken, accessTokenCookieOptions);
+		res.cookie(REFRESH_TOKEN, refreshToken, refreshTokenCookieOptions);
 
 		this.logger.verbose(`Successfully refreshed token for user with user ID: '${userId}'`);
 		return;
