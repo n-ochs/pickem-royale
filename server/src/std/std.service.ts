@@ -1,5 +1,5 @@
 import { StdTables } from '@common/constants';
-import { StdTable } from '@common/models/std_table.model';
+import { StdTable } from '@common/models';
 import { Injectable, Logger } from '@nestjs/common';
 import { StdLeagueTypeService, StdSportService } from '@std/services';
 

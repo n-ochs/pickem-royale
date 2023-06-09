@@ -11,6 +11,7 @@ export class RtStrategy extends PassportStrategy(Strategy, JWT_REFRESH) {
 	constructor() {
 		super({
 			jwtFromRequest: RtStrategy.extractRtJwtFromCookie,
+			ignoreExpiration: false,
 			secretOrKey: process.env.RT_SECRET,
 			passReqToCallback: true
 		});
@@ -24,6 +25,7 @@ export class RtStrategy extends PassportStrategy(Strategy, JWT_REFRESH) {
 	}
 
 	// Validate JWT Signature & attach Refresh Token to request
+	// Need to pass the RT along in order to compare the it to the hash in the DB
 	validate(req: Request, payload: JwtPayload): JwtPayloadWithRt {
 		const refreshToken: string = req?.cookies[REFRESH_TOKEN];
 
