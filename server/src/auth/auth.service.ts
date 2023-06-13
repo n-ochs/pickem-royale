@@ -104,6 +104,38 @@ export class AuthService {
 	}
 
 	/**
+	 * Gets user details
+	 *
+	 * @param {number} userId
+	 * @return {*}  {(Promise<Omit<User, 'hash' | 'hashedRt'>>)}
+	 * @memberof AuthService
+	 */
+	async getUserDetails(userId: number): Promise<Omit<User, 'hash' | 'hashedRt'>> {
+		this.logger.verbose(`Getting user info for user ID: '${userId}'`);
+
+		const user: Omit<User, 'hash' | 'hashedRt'> = await this.prisma.user.findUnique({
+			where: {
+				id: userId
+			},
+			select: {
+				id: true,
+				email: true,
+				createdAt: true,
+				updatedAt: true
+			}
+		});
+
+		if (!user) {
+			this.logger.error(`User not found for user ID: '${userId}'`);
+			throw new ForbiddenException('Access Denied');
+		}
+
+		this.logger.verbose(`Found user info for user ID: '${userId}'`);
+
+		return user;
+	}
+
+	/**
 	 * Allows users to sign up with email & password
 	 *
 	 * @param {AuthDto} dto
