@@ -1,5 +1,5 @@
-import { APIService } from '@util/api/axios_api.service';
-import { ICredentials } from '@util/types/auth.types';
+import { APIService } from '@util/api';
+import { ICredentials } from '@util/types/auth.type';
 
 export const isAuthenticated: () => Promise<void> = async () => {
 	return APIService.get('/auth');

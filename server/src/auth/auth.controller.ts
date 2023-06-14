@@ -6,6 +6,7 @@ import { REFRESH_TOKEN } from '@common/constants';
 import { GetCurrentUser, GetCurrentUserId, Public } from '@common/decorators';
 import { RtGuard } from '@common/guards';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +16,12 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	async isAuthenticated(): Promise<void> {
 		return this.authService.isAuthenticated();
+	}
+
+	@Get('user')
+	@HttpCode(HttpStatus.OK)
+	async getUserDetails(@GetCurrentUserId() userId: number): Promise<Omit<User, 'hash' | 'hashedRt'>> {
+		return this.authService.getUserDetails(userId);
 	}
 
 	@Public()
@@ -40,7 +47,7 @@ export class AuthController {
 	@Public()
 	@UseGuards(RtGuard)
 	@Post('refresh')
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.NO_CONTENT)
 	async refreshToken(@GetCurrentUserId() userId: number, @GetCurrentUser(REFRESH_TOKEN) refreshToken: string, @Response({ passthrough: true }) res: Res): Promise<void> {
 		return this.authService.refreshTokens(userId, refreshToken, res);
 	}
