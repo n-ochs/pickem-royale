@@ -13,7 +13,7 @@ APIService.interceptors.request.use((config) => {
 });
 
 APIService.interceptors.response.use(
-	async (response) => {
+	(response) => {
 		response.data = response?.data?.data;
 		return response;
 	},
