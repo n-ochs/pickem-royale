@@ -13,12 +13,12 @@ const SignInForm: React.FC = () => {
 	const [password, setPassword] = useState<string>('');
 
 	const { mutate } = useMutation(signIn, {
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.dismiss();
-			router.push('/');
+			await router.push('/');
 			toast.success('Welcome back!');
 		},
-		onError: (error: AxiosError) => {
+		onError: async (error: AxiosError) => {
 			toast.dismiss();
 			toast.error(error.response?.status === 403 ? 'Incorrect username or password. Please try again.' : 'Error: Please contact support.');
 			setEmail('');

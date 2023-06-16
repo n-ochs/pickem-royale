@@ -37,4 +37,4 @@ async function bootstrap(): Promise<void> {
 	logger.log(`Application running on port ${process.env.PORT} 🚀`);
 }
 
-bootstrap();
+void bootstrap();
