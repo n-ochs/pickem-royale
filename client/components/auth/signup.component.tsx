@@ -14,12 +14,12 @@ const SignUpForm: React.FC = () => {
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 
 	const { mutate } = useMutation(signUp, {
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.dismiss();
-			router.push('/');
+			await router.push('/');
 			toast.success('Successfully created account and signed in.');
 		},
-		onError: (error: AxiosError<{ message: string }, any>) => {
+		onError: async (error: AxiosError<{ message: string }, any>) => {
 			toast.dismiss();
 			toast.error(error?.response?.data?.message || 'Something went wrong. Please try again or contact support.', { duration: 7000 });
 			setEmail('');

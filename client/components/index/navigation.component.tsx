@@ -14,12 +14,12 @@ const Navigation: React.FC = () => {
 	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
 
 	const { mutate: handleSignOut } = useMutation(signOut, {
-		onSuccess: () => {
-			router.push('/');
+		onSuccess: async () => {
+			await router.push('/');
 			toast.success('Successfully signed out.');
-			queryClient.invalidateQueries({ queryKey: ['isAuthenticated'] });
+			await queryClient.invalidateQueries({ queryKey: ['isAuthenticated'] });
 		},
-		onError: () => {
+		onError: async () => {
 			toast.error('Something went wrong. Please try again.', { duration: 7000 });
 		}
 	});
@@ -37,7 +37,7 @@ const Navigation: React.FC = () => {
 			<button
 				id='menu-btn'
 				onClick={() => setIsMenuOpen(!isMenuOpen)}
-				className={isMenuOpen ? 'open hamburger z-30 block focus:outline-none md:hidden' : 'hamburger block focus:outline-none md:hidden'}
+				className={isMenuOpen ? 'open hamburger z-30 mt-2 block focus:outline-none md:hidden' : 'hamburger mt-2 block focus:outline-none md:hidden'}
 			>
 				<span className='hamburger-top'></span>
 				<span className='hamburger-middle'></span>
