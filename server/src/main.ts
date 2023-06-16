@@ -25,7 +25,7 @@ async function bootstrap(): Promise<void> {
 		origin: process.env.ORIGIN,
 		exposedHeaders: '*',
 		credentials: true,
-		allowedHeaders: ['Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'requestId']
+		allowedHeaders: ['Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'request_id']
 	});
 
 	/* ------------------------------ Enable Prisma ----------------------------- */
