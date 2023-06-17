@@ -13,7 +13,8 @@ const SignUpForm: React.FC = () => {
 	const [password, setPassword] = useState<string>('');
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-	const { mutate } = useMutation(signUp, {
+	const { mutate } = useMutation({
+		mutationFn: signUp,
 		onSuccess: async () => {
 			toast.dismiss();
 			await router.push('/');

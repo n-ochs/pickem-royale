@@ -13,7 +13,8 @@ const Navigation: React.FC = () => {
 
 	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
 
-	const { mutate: handleSignOut } = useMutation(signOut, {
+	const { mutate: handleSignOut } = useMutation({
+		mutationFn: signOut,
 		onSuccess: async () => {
 			await router.push('/');
 			toast.success('Successfully signed out.');
