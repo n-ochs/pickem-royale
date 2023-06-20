@@ -22,6 +22,7 @@
 			"@app/*": ["src/app/*"],
 			"@common/*": ["src/common/*"],
 			"@league/*": ["src/league/*"],
+			"@logger/*": ["src/logger/*"],
 			"@prismaModule/*": ["src/prisma/*"],
 			"@std/*": ["src/std/*"]
 		}

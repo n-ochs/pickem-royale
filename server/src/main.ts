@@ -1,7 +1,8 @@
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from '@app/app.module';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { LoggerService } from '@logger/logger.service';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { PrismaService } from '@prismaModule/prisma.service';
 
@@ -12,9 +13,10 @@ import { PrismaService } from '@prismaModule/prisma.service';
  */
 async function bootstrap(): Promise<void> {
 	/* ------------------------------- Create App ------------------------------- */
-	const app: INestApplication = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn', 'debug', 'verbose'] });
-	const logger: Logger = new Logger();
-	logger.log('Logger initialized 📝');
+	const app: INestApplication = await NestFactory.create(AppModule, { bufferLogs: true });
+	app.useLogger(app.get(LoggerService));
+	const logger: LoggerService = new LoggerService(null);
+	logger.log('Logger initialized 📝', 'Main');
 
 	/* ------------------------------- Set Globals ------------------------------ */
 	app.setGlobalPrefix('/api');
@@ -31,11 +33,11 @@ async function bootstrap(): Promise<void> {
 	/* ------------------------------ Enable Prisma ----------------------------- */
 	const prismaService: PrismaService = app.get(PrismaService);
 	await prismaService.enableShutdownHooks(app);
-	logger.log('Prisma ORM initialized 🔼 🔌');
+	logger.log('Prisma ORM initialized 🔼 🔌', 'Main');
 
 	/* --------------------------------- Listen --------------------------------- */
 	await app.listen(process.env.PORT);
-	logger.log(`Application running on port ${process.env.PORT} 🚀`);
+	logger.log(`Application running on port ${process.env.PORT} 🚀`, 'Main');
 }
 
 void bootstrap();

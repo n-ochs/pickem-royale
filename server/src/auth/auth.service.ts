@@ -5,16 +5,15 @@ import { AuthDto } from '@auth/dto';
 import { JwtPayload, Tokens as Tokens } from '@auth/types';
 import { ACCESS_TOKEN, MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN, REFRESH_TOKEN } from '@common/constants';
 import { TokenCookieOptions } from '@common/models';
-import { BadRequestException, ForbiddenException, Injectable, Logger, Response } from '@nestjs/common';
+import { LoggerService } from '@logger/logger.service';
+import { BadRequestException, ForbiddenException, Injectable, Response } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class AuthService {
-	private readonly logger: Logger = new Logger(AuthService.name);
-
-	constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) {}
+	constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService, private readonly logger: LoggerService) {}
 
 	/**
 	 * Generates JWT tokens - access & refresh
@@ -26,7 +25,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	private async generateTokens(userId: number, email: string): Promise<Tokens> {
-		this.logger.verbose(`Generating JWTs for user with email: '${email}'`);
+		this.logger.verbose(`Generating JWTs for user with email: '${email}'`, AuthService.name);
 
 		const jwtPayload: JwtPayload = {
 			sub: userId,
@@ -44,7 +43,7 @@ export class AuthService {
 			})
 		]);
 
-		this.logger.verbose(`Successfully generated tokens for user with email: '${email}'`);
+		this.logger.verbose(`Successfully generated tokens for user with email: '${email}'`, AuthService.name);
 
 		return { accessToken, refreshToken };
 	}
@@ -59,7 +58,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	private async updateRtHash(userId: number, rt: string): Promise<void> {
-		this.logger.verbose(`Updating RT hash for user ID: '${userId}'`);
+		this.logger.verbose(`Updating RT hash for user ID: '${userId}'`, AuthService.name);
 
 		const hash: string = await argon.hash(rt);
 
@@ -72,7 +71,7 @@ export class AuthService {
 			}
 		});
 
-		this.logger.verbose(`Successfully updated RT hash in DB for user ID: '${userId}'`);
+		this.logger.verbose(`Successfully updated RT hash in DB for user ID: '${userId}'`, AuthService.name);
 	}
 
 	/**
@@ -93,7 +92,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	async getUserDetails(userId: number): Promise<Omit<User, 'hash' | 'hashedRt'>> {
-		this.logger.verbose(`Getting user info for user ID: '${userId}'`);
+		this.logger.verbose(`Getting user info for user ID: '${userId}'`, AuthService.name);
 
 		const user: Omit<User, 'hash' | 'hashedRt'> = await this.prisma.user.findUnique({
 			where: {
@@ -108,11 +107,11 @@ export class AuthService {
 		});
 
 		if (!user) {
-			this.logger.error(`User not found for user ID: '${userId}'`);
+			this.logger.error(`User not found for user ID: '${userId}'`, AuthService.name);
 			throw new ForbiddenException('Access Denied');
 		}
 
-		this.logger.verbose(`Found user info for user ID: '${userId}'`);
+		this.logger.verbose(`Found user info for user ID: '${userId}'`, AuthService.name);
 
 		return user;
 	}
@@ -126,7 +125,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	async signUp(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
-		this.logger.verbose(`Creating user account for user with email '${dto.email}'`);
+		this.logger.verbose(`Creating user account for user with email '${dto.email}'`, AuthService.name);
 
 		// Hash password
 		const hashedPassword: string = await argon.hash(dto.password);
@@ -148,9 +147,9 @@ export class AuthService {
 			res.cookie(ACCESS_TOKEN, accessToken, new TokenCookieOptions(null, MAX_AGE_ACCESS_TOKEN, process.env.DOMAIN, '/'));
 			res.cookie(REFRESH_TOKEN, refreshToken, new TokenCookieOptions(null, MAX_AGE_REFRESH_TOKEN, process.env.DOMAIN, '/api/auth/refresh'));
 
-			this.logger.verbose(`Successfully created user account and signed in user with email: '${dto.email}'`);
+			this.logger.verbose(`Successfully created user account and signed in user with email: '${dto.email}'`, AuthService.name);
 		} catch (error) {
-			this.logger.error(`Problem creating user account for user with email: '${dto.email}'. User with email may already exist`);
+			this.logger.error(`Problem creating user account for user with email: '${dto.email}'. User with email may already exist`, AuthService.name);
 			throw new BadRequestException('Problem creating user account. User with email may already exist. Please try again or contact support.');
 		}
 
@@ -166,7 +165,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
-		this.logger.verbose(`Signing in user with email: '${dto.email}'`);
+		this.logger.verbose(`Signing in user with email: '${dto.email}'`, AuthService.name);
 		// Find user
 		const user: User = await this.prisma.user.findUnique({
 			where: {
@@ -174,14 +173,14 @@ export class AuthService {
 			}
 		});
 		if (!user) {
-			this.logger.error(`Problem signing in user with email: '${dto.email}'. Account with provided email does not exist`);
+			this.logger.error(`Problem signing in user with email: '${dto.email}'. Account with provided email does not exist`, AuthService.name);
 			throw new ForbiddenException('Access Denied');
 		}
 
 		// Verify password & hash match
 		const passwordMatches: boolean = await argon.verify(user.hash, dto.password);
 		if (!passwordMatches) {
-			this.logger.error(`Problem signing in user with email: '${dto.email}'. Client password hash does not match DB password hash`);
+			this.logger.error(`Problem signing in user with email: '${dto.email}'. Client password hash does not match DB password hash`, AuthService.name);
 			throw new ForbiddenException('Access Denied');
 		}
 
@@ -193,7 +192,7 @@ export class AuthService {
 		res.cookie(ACCESS_TOKEN, accessToken, new TokenCookieOptions(null, MAX_AGE_ACCESS_TOKEN, process.env.DOMAIN, '/'));
 		res.cookie(REFRESH_TOKEN, refreshToken, new TokenCookieOptions(null, MAX_AGE_REFRESH_TOKEN, process.env.DOMAIN, '/api/auth/refresh'));
 
-		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`);
+		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`, AuthService.name);
 		return;
 	}
 
@@ -206,7 +205,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	async signOut(userId: number, @Response({ passthrough: true }) res: Res): Promise<void> {
-		this.logger.verbose(`Signing out user with user ID: '${userId}'`);
+		this.logger.verbose(`Signing out user with user ID: '${userId}'`, AuthService.name);
 
 		await this.prisma.user.updateMany({
 			where: {
@@ -224,7 +223,7 @@ export class AuthService {
 		res.clearCookie(ACCESS_TOKEN, { domain: process.env.DOMAIN, path: '/' });
 		res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 
-		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`);
+		this.logger.verbose(`Successfully signed out user with user ID: '${userId}'`, AuthService.name);
 		return;
 	}
 
@@ -238,7 +237,7 @@ export class AuthService {
 	 * @memberof AuthService
 	 */
 	async refreshTokens(userId: number, rt: string, @Response({ passthrough: true }) res: Res): Promise<void> {
-		this.logger.verbose(`Refreshing tokens for user with user ID: '${userId}'`);
+		this.logger.verbose(`Refreshing tokens for user with user ID: '${userId}'`, AuthService.name);
 
 		// Find the user
 		const user: User = await this.prisma.user.findUnique({
@@ -248,14 +247,14 @@ export class AuthService {
 		});
 
 		if (!user) {
-			this.logger.error(`Problem finding user with user ID: '${userId}'`);
+			this.logger.error(`Problem finding user with user ID: '${userId}'`, AuthService.name);
 			res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 
 			throw new ForbiddenException('Access Denied');
 		}
 
 		if (!user?.hashedRt) {
-			this.logger.error(`Hashed RT does not exist in DB for user ID: '${userId}'`);
+			this.logger.error(`Hashed RT does not exist in DB for user ID: '${userId}'`, AuthService.name);
 			res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 
 			throw new ForbiddenException('Access Denied');
@@ -266,7 +265,7 @@ export class AuthService {
 
 		// If RT hash doesn't match, reset hashed RT in DB and clear cookie, throw error
 		if (!rtMatches) {
-			this.logger.error(`Request RT does not match DB hashed RT for user with user ID: '${userId}'`);
+			this.logger.error(`Request RT does not match DB hashed RT for user with user ID: '${userId}'`, AuthService.name);
 			await this.prisma.user.update({
 				where: {
 					id: userId
@@ -287,7 +286,7 @@ export class AuthService {
 		res.cookie(ACCESS_TOKEN, accessToken, new TokenCookieOptions(null, MAX_AGE_ACCESS_TOKEN, process.env.DOMAIN, '/'));
 		res.cookie(REFRESH_TOKEN, refreshToken, new TokenCookieOptions(null, MAX_AGE_REFRESH_TOKEN, process.env.DOMAIN, '/api/auth/refresh'));
 
-		this.logger.verbose(`Successfully refreshed token for user with user ID: '${userId}'`);
+		this.logger.verbose(`Successfully refreshed token for user with user ID: '${userId}'`, AuthService.name);
 		return;
 	}
 }

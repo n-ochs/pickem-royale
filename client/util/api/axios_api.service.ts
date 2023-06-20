@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { nanoid } from 'nanoid';
+import { v4 as uuid } from 'uuid';
 
 const APIService: AxiosInstance = axios.create({
 	baseURL: `${process.env.NEXT_PUBLIC_BASEURL}/api`,
@@ -8,7 +8,7 @@ const APIService: AxiosInstance = axios.create({
 
 APIService.interceptors.request.use((config) => {
 	// eslint-disable-next-line camelcase
-	config.headers.request_id = nanoid();
+	config.headers.request_id = uuid();
 	return config;
 });
 

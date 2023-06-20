@@ -1,15 +1,29 @@
+import { ClsModule } from 'nestjs-cls';
+import { v4 as uuid } from 'uuid';
+
 import { AuthModule } from '@auth/auth.module';
 import { AtGuard } from '@common/guards';
 import { TransformationInterceptor } from '@common/interceptors/transform_response.interceptor';
 import { RequestLoggerMiddleware } from '@common/middleware';
 import { LeagueModule } from '@league/league.module';
+import { LoggerModule } from '@logger/logger.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from '@prismaModule/prisma.module';
 import { StdModule } from '@std/std.module';
 
 @Module({
-	imports: [AuthModule, LeagueModule, PrismaModule, StdModule],
+	imports: [
+		ClsModule.forRoot({
+			global: true,
+			middleware: { mount: true, generateId: true, idGenerator: (req: Request) => req.headers['request_id'] ?? uuid() }
+		}),
+		AuthModule,
+		LeagueModule,
+		LoggerModule,
+		PrismaModule,
+		StdModule
+	],
 	providers: [
 		{
 			provide: APP_GUARD,
@@ -22,7 +36,12 @@ import { StdModule } from '@std/std.module';
 	]
 })
 export class AppModule implements NestModule {
+	// constructor(private readonly clsService: ClsService<Store>) {}
+
 	configure(consumer: MiddlewareConsumer): void {
 		consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+		// consumer.apply((req: Request, _: Response, next: NextFunction) => {
+		// 	this.clsService.run(() => next())
+		// })
 	}
 }
