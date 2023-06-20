@@ -1,13 +1,12 @@
 import { CreateLeagueDto } from '@league/dto';
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { LoggerService } from '@logger/logger.service';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { League } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class LeagueService {
-	private readonly logger: Logger = new Logger(LeagueService.name);
-
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService, private readonly logger: LoggerService) {}
 
 	/**
 	 * Creates a new league
@@ -18,7 +17,7 @@ export class LeagueService {
 	 * @memberof LeagueService
 	 */
 	async create(dto: CreateLeagueDto, userId: number): Promise<void> {
-		this.logger.verbose(`Creating league '${dto.name}' for userId ${userId}`);
+		this.logger.verbose(`Creating league '${dto.name}' for userId ${userId}`, LeagueService.name);
 
 		try {
 			await this.prisma.league.create({
@@ -31,9 +30,9 @@ export class LeagueService {
 					leagueTypeId: dto.leagueTypeId
 				}
 			});
-			this.logger.verbose(`Successfully created league '${dto.name}' for userId ${userId}`);
+			this.logger.verbose(`Successfully created league '${dto.name}' for userId ${userId}`, LeagueService.name);
 		} catch (error) {
-			this.logger.error(`Problem creating league '${dto.name}' for userId ${userId}`);
+			this.logger.error(`Problem creating league '${dto.name}' for userId ${userId}`, LeagueService.name);
 			throw new BadRequestException('Problem creating league. Please try again or contact support.');
 		}
 
@@ -48,7 +47,7 @@ export class LeagueService {
 	 * @memberof LeagueService
 	 */
 	async findOne(leagueId: number): Promise<League> {
-		this.logger.verbose(`Getting league data for leagueId '${leagueId}'`);
+		this.logger.verbose(`Getting league data for leagueId '${leagueId}'`, LeagueService.name);
 
 		// make sure user belongs to league or has certain privs or league is public. maybe make this a separate function
 
@@ -63,11 +62,11 @@ export class LeagueService {
 		});
 
 		if (!league) {
-			this.logger.error(`Problem getting league data for leagueId '${leagueId}'. League does not exist.`);
+			this.logger.error(`Problem getting league data for leagueId '${leagueId}'. League does not exist.`, LeagueService.name);
 			throw new NotFoundException('Problem getting league data. League does not exist.');
 		}
 
-		this.logger.verbose(`Successfully retreived league data for leagueId '${leagueId}'`);
+		this.logger.verbose(`Successfully retreived league data for leagueId '${leagueId}'`, LeagueService.name);
 		return league;
 	}
 
@@ -79,7 +78,7 @@ export class LeagueService {
 	 * @memberof LeagueService
 	 */
 	async findMany(leagueIds: number[]): Promise<League[]> {
-		this.logger.verbose(`Getting league data for leagueIds '${leagueIds}'`);
+		this.logger.verbose(`Getting league data for leagueIds '${leagueIds}'`, LeagueService.name);
 
 		// make sure user belongs to league or has certain privs or league is public. maybe make this a separate function
 
@@ -94,11 +93,11 @@ export class LeagueService {
 		});
 
 		if (!leagues || leagues?.length < 1 || leagues?.length !== leagueIds.length) {
-			this.logger.error(`Problem getting league data for leagueIds '${leagueIds}'. One or more leagues may not exist.`);
+			this.logger.error(`Problem getting league data for leagueIds '${leagueIds}'. One or more leagues may not exist.`, LeagueService.name);
 			throw new NotFoundException('Problem getting league data. One or more leagues may not exist.');
 		}
 
-		this.logger.verbose(`Successfully retreived league data for leagueIds '${leagueIds}'`);
+		this.logger.verbose(`Successfully retreived league data for leagueIds '${leagueIds}'`, LeagueService.name);
 		return leagues;
 	}
 
@@ -110,18 +109,18 @@ export class LeagueService {
 	 * @memberof LeagueService
 	 */
 	async findAll(isPublic: boolean): Promise<League[]> {
-		this.logger.verbose('Getting all league data');
+		this.logger.verbose('Getting all league data', LeagueService.name);
 
 		// check privileges
 
 		const leagues: League[] = await this.prisma.league.findMany({ where: { isPublic }, include: { sport: true, leagueType: true } });
 
 		if (!leagues || leagues?.length < 1) {
-			this.logger.error('Problem getting league data');
+			this.logger.error('Problem getting league data', LeagueService.name);
 			throw new NotFoundException('Problem getting league data.');
 		}
 
-		this.logger.verbose('Successfully retreived all league data');
+		this.logger.verbose('Successfully retreived all league data', LeagueService.name);
 		return leagues;
 	}
 }

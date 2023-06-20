@@ -1,12 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { LoggerService } from '@logger/logger.service';
+import { Injectable } from '@nestjs/common';
 import { StdSport } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class StdSportService {
-	private readonly logger: Logger = new Logger(StdSportService.name);
-
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService, private readonly logger: LoggerService) {}
 
 	/**
 	 * Find one Standard Sport
@@ -16,7 +15,7 @@ export class StdSportService {
 	 * @memberof StdSportService
 	 */
 	async findOne(id: number): Promise<StdSport> {
-		this.logger.log(`Finding StdSport with id: ${id}`);
+		this.logger.log(`Finding StdSport with id: ${id}`, StdSportService.name);
 		return this.prisma.stdSport.findFirstOrThrow({ where: { id } });
 	}
 
@@ -28,7 +27,7 @@ export class StdSportService {
 	 * @memberof StdSportService
 	 */
 	async findMany(ids: number[]): Promise<StdSport[]> {
-		this.logger.log(`Finding StdSports with ids: ${ids}`);
+		this.logger.log(`Finding StdSports with ids: ${ids}`, StdSportService.name);
 		return this.prisma.stdSport.findMany({ where: { id: { in: ids } } });
 	}
 
@@ -39,7 +38,7 @@ export class StdSportService {
 	 * @memberof StdSportService
 	 */
 	async findAll(): Promise<StdSport[]> {
-		this.logger.log('Finding all StdSports');
+		this.logger.log('Finding all StdSports', StdSportService.name);
 		return this.prisma.stdSport.findMany();
 	}
 }

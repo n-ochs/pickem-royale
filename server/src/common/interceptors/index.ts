@@ -1,1 +1,1 @@
-// export * from '@common/interceptors/transform_response.interceptor';
+export * from '@common/interceptors/transform_response.interceptor';

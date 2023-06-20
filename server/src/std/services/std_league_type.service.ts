@@ -1,12 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { LoggerService } from '@logger/logger.service';
+import { Injectable } from '@nestjs/common';
 import { StdLeagueType } from '@prisma/client';
 import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class StdLeagueTypeService {
-	private readonly logger: Logger = new Logger(StdLeagueTypeService.name);
-
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(private readonly prisma: PrismaService, private readonly logger: LoggerService) {}
 
 	/**
 	 * Find one Standard League Type
@@ -16,7 +15,7 @@ export class StdLeagueTypeService {
 	 * @memberof StdLeagueTypeService
 	 */
 	async findOne(id: number): Promise<StdLeagueType> {
-		this.logger.log(`Finding StdLeagueType with id: ${id}`);
+		this.logger.log(`Finding StdLeagueType with id: ${id}`, StdLeagueTypeService.name);
 		return this.prisma.stdLeagueType.findFirstOrThrow({ where: { id } });
 	}
 
@@ -28,7 +27,7 @@ export class StdLeagueTypeService {
 	 * @memberof StdLeagueTypeService
 	 */
 	async findMany(ids: number[]): Promise<StdLeagueType[]> {
-		this.logger.log(`Finding StdLeagueTypes with ids: ${ids}`);
+		this.logger.log(`Finding StdLeagueTypes with ids: ${ids}`, StdLeagueTypeService.name);
 		return this.prisma.stdLeagueType.findMany({ where: { id: { in: ids } } });
 	}
 
@@ -39,7 +38,7 @@ export class StdLeagueTypeService {
 	 * @memberof StdLeagueTypeService
 	 */
 	async findAll(): Promise<StdLeagueType[]> {
-		this.logger.log('Finding all StdLeagueTypes');
+		this.logger.log('Finding all StdLeagueTypes', StdLeagueTypeService.name);
 		return this.prisma.stdLeagueType.findMany();
 	}
 }
