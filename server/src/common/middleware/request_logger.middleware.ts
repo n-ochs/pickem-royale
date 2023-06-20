@@ -15,14 +15,17 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 		const requestTs: string = dayjs().toISOString();
 		const requestId: string = (request.headers?.['request_id'] as string) || '';
 
-		this.logger.log(`REQUEST ${requestId ? requestId + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, 'HTTP');
+		this.logger.log(`REQUEST ${requestId ? '[' + requestId + ']' + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, 'HTTP');
 
 		response.on('close', () => {
 			const { statusCode } = response;
 			const responseTs: string = dayjs().toISOString();
 			const contentLength: string = response.get('content-length');
 
-			this.logger.log(`RESPONSE ${requestId ? requestId + ' ' : ''}${responseTs} ${method} ${path} ${statusCode} ${contentLength ? contentLength + ' ' : ''}- ${userAgent} ${ip}`, 'HTTP');
+			this.logger.log(
+				`RESPONSE ${requestId ? '[' + requestId + ']' + ' ' : ''}${responseTs} ${method} ${path} ${statusCode} ${contentLength ? contentLength + ' ' : ''}- ${userAgent} ${ip}`,
+				'HTTP'
+			);
 		});
 
 		next();
