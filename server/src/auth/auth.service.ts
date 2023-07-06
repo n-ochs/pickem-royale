@@ -248,6 +248,7 @@ export class AuthService {
 
 		if (!user) {
 			this.logger.error(`Problem finding user with user ID: '${userId}'`, AuthService.name);
+			res.clearCookie(ACCESS_TOKEN, { domain: process.env.DOMAIN, path: '/' });
 			res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 
 			throw new ForbiddenException('Access Denied');
@@ -255,6 +256,7 @@ export class AuthService {
 
 		if (!user?.hashedRt) {
 			this.logger.error(`Hashed RT does not exist in DB for user ID: '${userId}'`, AuthService.name);
+			res.clearCookie(ACCESS_TOKEN, { domain: process.env.DOMAIN, path: '/' });
 			res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 
 			throw new ForbiddenException('Access Denied');
@@ -274,6 +276,7 @@ export class AuthService {
 					hashedRt: null
 				}
 			});
+			res.clearCookie(ACCESS_TOKEN, { domain: process.env.DOMAIN, path: '/' });
 			res.clearCookie(REFRESH_TOKEN, { domain: process.env.DOMAIN, path: '/api/auth/refresh' });
 			throw new ForbiddenException('Access Denied');
 		}

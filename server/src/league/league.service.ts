@@ -6,7 +6,10 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class LeagueService {
-	constructor(private readonly prisma: PrismaService, private readonly logger: LoggerService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly logger: LoggerService
+	) {}
 
 	/**
 	 * Creates a new league

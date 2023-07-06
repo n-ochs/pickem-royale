@@ -15,7 +15,11 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 		const requestTs: string = dayjs().toISOString();
 		const requestId: string = (request.headers?.['request_id'] as string) || '';
 
-		this.logger.log(`REQUEST ${requestId ? '[' + requestId + ']' + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, 'HTTP');
+		this.logger.log(`REQUEST ${requestId ? '[' + requestId + ']' + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, RequestLoggerMiddleware.name);
+
+		if (requestId === '') {
+			this.logger.verbose('No request ID found in headers - one will be generated', RequestLoggerMiddleware.name);
+		}
 
 		response.on('close', () => {
 			const { statusCode } = response;
@@ -24,7 +28,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
 			this.logger.log(
 				`RESPONSE ${requestId ? '[' + requestId + ']' + ' ' : ''}${responseTs} ${method} ${path} ${statusCode} ${contentLength ? contentLength + ' ' : ''}- ${userAgent} ${ip}`,
-				'HTTP'
+				RequestLoggerMiddleware.name
 			);
 		});
 

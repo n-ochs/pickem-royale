@@ -47,7 +47,7 @@ export class AuthController {
 	@Public()
 	@UseGuards(RtGuard)
 	@Post('refresh')
-	@HttpCode(HttpStatus.NO_CONTENT)
+	@HttpCode(HttpStatus.OK)
 	async refreshToken(@GetCurrentUserId() userId: number, @GetCurrentUser(REFRESH_TOKEN) refreshToken: string, @Response({ passthrough: true }) res: Res): Promise<void> {
 		return this.authService.refreshTokens(userId, refreshToken, res);
 	}
