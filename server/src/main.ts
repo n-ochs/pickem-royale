@@ -1,4 +1,4 @@
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 import { AppModule } from '@app/app.module';
 import { LoggerService } from '@logger/logger.service';
@@ -27,6 +27,7 @@ async function bootstrap(): Promise<void> {
 		origin: process.env.ORIGIN,
 		exposedHeaders: '*',
 		credentials: true,
+		maxAge: 3600,
 		allowedHeaders: ['Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'request_id']
 	});
 

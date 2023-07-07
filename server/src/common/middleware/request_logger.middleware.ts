@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { NextFunction, Request, Response } from 'express';
 
 import { LoggerService } from '@logger/logger.service';
