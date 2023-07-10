@@ -78,7 +78,11 @@ export class LoggerService extends ConsoleLogger {
 
 	verbose(message: any, stack?: string, context?: string): void {
 		const requestId: string = this.clsService.getId();
-		const newMessage: string = [`[${requestId}]`, message].join(' - ');
+		let newMessage: string = message;
+
+		if (requestId) {
+			newMessage = [`[${requestId}]`, message].join(' - ');
+		}
 
 		if (stack && !context) {
 			super.verbose(newMessage, stack);

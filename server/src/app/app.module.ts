@@ -7,6 +7,7 @@ import { TransformationInterceptor } from '@common/interceptors';
 import { RequestLoggerMiddleware } from '@common/middleware';
 import { LeagueModule } from '@league/league.module';
 import { LoggerModule } from '@logger/logger.module';
+import { LoggerService } from '@logger/logger.service';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule } from '@prismaModule/prisma.module';
@@ -36,7 +37,10 @@ import { StdModule } from '@std/std.module';
 	]
 })
 export class AppModule implements NestModule {
+	logger: LoggerService = new LoggerService(null);
+
 	configure(consumer: MiddlewareConsumer): void {
 		consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+		this.logger.debug('Mounting RequestLoggerMiddleware to *', AppModule.name);
 	}
 }
