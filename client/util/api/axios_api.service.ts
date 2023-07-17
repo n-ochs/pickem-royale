@@ -3,7 +3,10 @@ import { v4 as uuid } from 'uuid';
 
 const APIService: AxiosInstance = axios.create({
 	baseURL: `${process.env.NEXT_PUBLIC_BASEURL}/api`,
-	withCredentials: true
+	withCredentials: true,
+	headers: {
+		'Content-Type': 'application/json'
+	}
 });
 
 APIService.interceptors.request.use((config) => {
@@ -14,7 +17,7 @@ APIService.interceptors.request.use((config) => {
 
 APIService.interceptors.response.use(
 	(response) => {
-		response.data = response?.data?.data;
+		response = response?.data?.data;
 		return response;
 	},
 	async (error) => {
@@ -23,7 +26,7 @@ APIService.interceptors.response.use(
 		}
 
 		if (error?.response?.status === 401) {
-			await APIService.post('/auth/refresh', null);
+			await APIService.post('/auth/refresh');
 			return APIService(error?.config);
 		}
 		return Promise.reject(error);

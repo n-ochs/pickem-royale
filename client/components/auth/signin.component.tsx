@@ -3,10 +3,17 @@ import { NextRouter, useRouter } from 'next/router';
 import React, { FormEvent, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 
-import { useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@util/api';
+import { QueryKey } from '@util/constants';
+import { UserDetails } from '@util/types';
 
-const SignInForm: React.FC = () => {
+interface ISignInFormProps {
+	from?: string;
+}
+
+const SignInForm: React.FC<ISignInFormProps> = ({ from }) => {
+	const queryClient: QueryClient = useQueryClient();
 	const router: NextRouter = useRouter();
 	const emailInputRef: React.MutableRefObject<HTMLInputElement> = useRef(null);
 	const [email, setEmail] = useState<string>('');
@@ -14,9 +21,14 @@ const SignInForm: React.FC = () => {
 
 	const { mutate } = useMutation({
 		mutationFn: signIn,
-		onSuccess: async () => {
+		onSuccess: async (data: UserDetails) => {
+			queryClient.setQueryData([QueryKey.USER_DETAILS], data);
 			toast.dismiss();
-			await router.push('/');
+			if (from) {
+				await router.push(`/${from}`);
+			} else {
+				await router.push('/');
+			}
 			toast.success('Welcome back!');
 		},
 		onError: async (error: AxiosError) => {

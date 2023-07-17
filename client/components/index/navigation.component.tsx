@@ -4,21 +4,22 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { isAuthenticated, signOut } from '@util/api';
+import { signOut, userDetails } from '@util/api';
+import { QueryKey } from '@util/constants';
 
 const Navigation: React.FC = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 	const router: NextRouter = useRouter();
 	const queryClient: QueryClient = useQueryClient();
 
-	const { isLoading, isSuccess } = useQuery({ queryKey: ['isAuthenticated'], queryFn: isAuthenticated, retry: false });
+	const { isLoading, isSuccess } = useQuery({ queryKey: [QueryKey.USER_DETAILS], queryFn: userDetails, retry: false });
 
 	const { mutate: handleSignOut } = useMutation({
 		mutationFn: signOut,
 		onSuccess: async () => {
 			await router.push('/');
 			toast.success('Successfully signed out.');
-			await queryClient.invalidateQueries({ queryKey: ['isAuthenticated'] });
+			queryClient.removeQueries([QueryKey.USER_DETAILS]);
 		},
 		onError: async () => {
 			toast.error('Something went wrong. Please try again.', { duration: 7000 });

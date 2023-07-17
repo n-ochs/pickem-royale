@@ -6,7 +6,11 @@ import { StdLeagueTypeService, StdSportService } from '@std/services';
 
 @Injectable()
 export class StdService {
-	constructor(private readonly stdLeagueTypeService: StdLeagueTypeService, private readonly stdSportService: StdSportService, private readonly logger: LoggerService) {}
+	constructor(
+		private readonly stdLeagueTypeService: StdLeagueTypeService,
+		private readonly stdSportService: StdSportService,
+		private readonly logger: LoggerService
+	) {}
 
 	/**
 	 * Finds all Std Tables in the DB

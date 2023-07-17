@@ -4,7 +4,6 @@ import { AppModule } from '@app/app.module';
 import { LoggerService } from '@logger/logger.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { PrismaService } from '@prismaModule/prisma.service';
 
 /**
  * Initializes NestJS App
@@ -20,8 +19,14 @@ async function bootstrap(): Promise<void> {
 
 	/* ------------------------------- Set Globals ------------------------------ */
 	app.setGlobalPrefix('/api');
+	logger.log('Set global prefix to /api', 'Main');
+
 	app.use(cookieParser());
+	logger.log('Initialized Cookie Parser 🍪', 'Main');
+
 	app.useGlobalPipes(new ValidationPipe());
+	logger.log('Initialized global validation pipe ✅', 'Main');
+
 	app.enableCors({
 		methods: '*',
 		origin: process.env.ORIGIN,
@@ -30,11 +35,9 @@ async function bootstrap(): Promise<void> {
 		maxAge: 3600,
 		allowedHeaders: ['Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'request_id']
 	});
+	logger.log('Enabled CORS', 'Main');
 
-	/* ------------------------------ Enable Prisma ----------------------------- */
-	const prismaService: PrismaService = app.get(PrismaService);
-	await prismaService.enableShutdownHooks(app);
-	logger.log('Prisma ORM initialized 🔼 🔌', 'Main');
+	app.enableShutdownHooks();
 
 	/* --------------------------------- Listen --------------------------------- */
 	await app.listen(process.env.PORT);

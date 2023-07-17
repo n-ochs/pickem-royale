@@ -5,7 +5,10 @@ import { PrismaService } from '@prismaModule/prisma.service';
 
 @Injectable()
 export class StdSportService {
-	constructor(private readonly prisma: PrismaService, private readonly logger: LoggerService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly logger: LoggerService
+	) {}
 
 	/**
 	 * Find one Standard Sport

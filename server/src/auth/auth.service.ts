@@ -3,6 +3,7 @@ import { Response as Res } from 'express';
 
 import { AuthDto } from '@auth/dto';
 import { JwtPayload, Tokens as Tokens } from '@auth/types';
+import { UserDetails } from '@auth/types/user_details.type';
 import { ACCESS_TOKEN, MAX_AGE_ACCESS_TOKEN, MAX_AGE_REFRESH_TOKEN, REFRESH_TOKEN } from '@common/constants';
 import { TokenCookieOptions } from '@common/models';
 import { LoggerService } from '@logger/logger.service';
@@ -79,26 +80,16 @@ export class AuthService {
 	}
 
 	/**
-	 * Quick check to see if user is authenticated
-	 *
-	 * @return {*}  {Promise<void>}
-	 * @memberof AuthService
-	 */
-	async isAuthenticated(): Promise<void> {
-		return;
-	}
-
-	/**
 	 * Gets user details
 	 *
 	 * @param {number} userId
 	 * @return {*}  {(Promise<Omit<User, 'hash' | 'hashedRt'>>)}
 	 * @memberof AuthService
 	 */
-	async getUserDetails(userId: number): Promise<Omit<User, 'hash' | 'hashedRt'>> {
+	async userDetails(userId: number): Promise<UserDetails> {
 		this.logger.verbose(`Getting user info for user ID: '${userId}'`, AuthService.name);
 
-		const user: Omit<User, 'hash' | 'hashedRt'> = await this.prisma.user.findUnique({
+		const user: UserDetails = await this.prisma.user.findUnique({
 			where: {
 				id: userId
 			},
@@ -168,7 +159,7 @@ export class AuthService {
 	 * @return {*}  {Promise<void>}
 	 * @memberof AuthService
 	 */
-	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
+	async signIn(dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<UserDetails> {
 		this.logger.verbose(`Signing in user with email: '${dto.email}'`, AuthService.name);
 		// Find user
 		const user: User = await this.prisma.user.findUnique({
@@ -197,7 +188,7 @@ export class AuthService {
 		res.cookie(REFRESH_TOKEN, refreshToken, new TokenCookieOptions(null, MAX_AGE_REFRESH_TOKEN, process.env.DOMAIN, '/api/auth/refresh'));
 
 		this.logger.verbose(`Successfully signed in user with email: '${dto.email}'`, AuthService.name);
-		return;
+		return { id: user.id, email: user.email, createdAt: user.createdAt, updatedAt: user.updatedAt };
 	}
 
 	/**

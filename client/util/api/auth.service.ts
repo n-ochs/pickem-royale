@@ -1,20 +1,21 @@
 import { APIService } from '@util/api';
+import { UserDetails } from '@util/types';
 import { ICredentials } from '@util/types/auth.type';
 
-export const isAuthenticated: () => Promise<void> = async () => {
-	return APIService.get('/auth');
+const baseRoute: string = '/auth';
+
+export const userDetails: () => Promise<UserDetails> = async () => {
+	return APIService.get(`${baseRoute}/user`);
 };
 
-export const signIn: (credentials: ICredentials) => Promise<void> = async (credentials: ICredentials) => {
-	const { email, password } = credentials;
-	return APIService.post('/auth/signin', { email, password }, { headers: { 'Content-Type': 'application/json' } });
+export const signIn: (credentials: ICredentials) => Promise<UserDetails> = async (credentials: ICredentials) => {
+	return APIService.post(`${baseRoute}/signin`, credentials);
 };
 
 export const signUp: (credentials: ICredentials) => Promise<void> = async (credentials: ICredentials) => {
-	const { email, password } = credentials;
-	return APIService.post('/auth/signup', { email, password }, { headers: { 'Content-Type': 'application/json' } });
+	return APIService.post(`${baseRoute}/signup`, credentials);
 };
 
 export const signOut: () => Promise<void> = async () => {
-	return APIService.post('/auth/signout', null);
+	return APIService.post(`${baseRoute}/signout`);
 };

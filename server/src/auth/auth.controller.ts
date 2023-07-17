@@ -2,26 +2,20 @@ import { Response as Res } from 'express';
 
 import { AuthService } from '@auth/auth.service';
 import { AuthDto } from '@auth/dto';
+import { UserDetails } from '@auth/types/user_details.type';
 import { REFRESH_TOKEN } from '@common/constants';
 import { GetCurrentUser, GetCurrentUserId, Public } from '@common/decorators';
 import { RtGuard } from '@common/guards';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Response, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
-	@Get()
-	@HttpCode(HttpStatus.OK)
-	async isAuthenticated(): Promise<void> {
-		return this.authService.isAuthenticated();
-	}
-
 	@Get('user')
 	@HttpCode(HttpStatus.OK)
-	async getUserDetails(@GetCurrentUserId() userId: number): Promise<Omit<User, 'hash' | 'hashedRt'>> {
-		return this.authService.getUserDetails(userId);
+	async userDetails(@GetCurrentUserId() userId: number): Promise<UserDetails> {
+		return this.authService.userDetails(userId);
 	}
 
 	@Public()
@@ -34,7 +28,7 @@ export class AuthController {
 	@Public()
 	@Post('signin')
 	@HttpCode(HttpStatus.OK)
-	async signIn(@Body() dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<void> {
+	async signIn(@Body() dto: AuthDto, @Response({ passthrough: true }) res: Res): Promise<UserDetails> {
 		return this.authService.signIn(dto, res);
 	}
 
