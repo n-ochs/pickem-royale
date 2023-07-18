@@ -25,7 +25,7 @@ const SignInForm: React.FC<ISignInFormProps> = ({ from }) => {
 			queryClient.setQueryData([QueryKey.USER_DETAILS], data);
 			toast.dismiss();
 			if (from) {
-				await router.push(`/${from}`);
+				await router.push(`/${decodeURIComponent(from)}`);
 			} else {
 				await router.push('/');
 			}
@@ -51,6 +51,7 @@ const SignInForm: React.FC<ISignInFormProps> = ({ from }) => {
 			<h2 className='text-2xl font-semibold text-gray-900'>Sign In</h2>
 			<div className='relative'>
 				<input
+					autoFocus
 					id='email'
 					name='email'
 					type='text'

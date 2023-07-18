@@ -47,6 +47,7 @@ const SignUpForm: React.FC = () => {
 			<h2 className='text-2xl font-semibold text-gray-900'>Sign Up</h2>
 			<div className='relative'>
 				<input
+					autoFocus
 					id='email'
 					name='email'
 					type='text'

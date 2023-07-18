@@ -22,7 +22,7 @@ const Protected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 	if (error) {
 		queryClient.removeQueries([QueryKey.USER_DETAILS]);
-		return void router.replace(`/signin?from=${router.pathname.replace('/', '')}`);
+		return void router.replace(`/signin?from=${encodeURIComponent(router.pathname)}`);
 	}
 
 	if (data && !error) {
