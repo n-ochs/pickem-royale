@@ -9,7 +9,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
 
 const App: (props: AppProps) => JSX.Element = ({ Component, pageProps }) => {
-	const [queryClient] = useState(() => new QueryClient());
+	const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } }));
 
 	return (
 		<QueryClientProvider client={queryClient}>
