@@ -3,6 +3,7 @@ import { NextRouter, useRouter } from 'next/router';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
+import Show from '@components/util/show.component';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { signOut, userDetails } from '@util/api';
 import { QueryKey } from '@util/constants';
@@ -60,24 +61,25 @@ const Navigation: React.FC = () => {
 			<h1 className='slogan hidden flex-[2] text-center text-4xl uppercase text-white lg:block'>Pickem Royale</h1>
 
 			<ul className='flex flex-1 justify-end space-x-8 text-lg'>
-				{!isLoading && (
-					<>
-						{isSuccess ? (
-							<button onClick={() => handleSignOut()}>
-								<li className='navbar-item'>Sign Out</li>
-							</button>
-						) : (
+				<Show when={!isLoading}>
+					<Show
+						when={isSuccess}
+						fallback={
 							<Link href='/signin'>
 								<li className='navbar-item'>Sign In</li>
 							</Link>
-						)}
-						{!isSuccess && (
-							<Link href='/signup'>
-								<li className='navbar-item'>Sign Up</li>
-							</Link>
-						)}
-					</>
-				)}
+						}
+					>
+						<button onClick={() => handleSignOut()}>
+							<li className='navbar-item'>Sign Out</li>
+						</button>
+					</Show>
+					<Show when={!isSuccess}>
+						<Link href='/signup'>
+							<li className='navbar-item'>Sign Up</li>
+						</Link>
+					</Show>
+				</Show>
 			</ul>
 			<div className='lg:hidden'>
 				<div

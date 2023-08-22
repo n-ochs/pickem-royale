@@ -25,7 +25,7 @@ const SignInForm: React.FC<ISignInFormProps> = ({ from }) => {
 			queryClient.setQueryData([QueryKey.USER_DETAILS], data);
 			toast.dismiss();
 			if (from) {
-				await router.push(`/${decodeURIComponent(from)}`);
+				await router.push(`${decodeURIComponent(from)}`);
 			} else {
 				await router.push('/');
 			}
