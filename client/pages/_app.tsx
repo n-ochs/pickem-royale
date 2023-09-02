@@ -15,7 +15,7 @@ const App: (props: AppProps) => JSX.Element = ({ Component, pageProps }) => {
 		<QueryClientProvider client={queryClient}>
 			<Component {...pageProps} />
 			<Toaster />
-			<ReactQueryDevtools initialIsOpen={false} />
+			<ReactQueryDevtools initialIsOpen />
 		</QueryClientProvider>
 	);
 };

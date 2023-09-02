@@ -1,33 +1,29 @@
 import { NextRouter, useRouter } from 'next/router';
 import React from 'react';
 
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { userDetails } from '@util/api';
 import { QueryKey } from '@util/constants';
 
 const Protected: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const router: NextRouter = useRouter();
-	const queryClient: QueryClient = useQueryClient();
 
-	const { data, error, fetchStatus, isLoading } = useQuery({
+	const { isError, isLoading } = useQuery({
 		queryKey: [QueryKey.USER_DETAILS],
 		queryFn: userDetails,
 		retry: false,
-		cacheTime: 0
+		cacheTime: 1000 * 60 * 15
 	});
 
-	if (isLoading || fetchStatus === 'fetching') {
-		return <p>loading...</p>;
+	if (isLoading) {
+		return <span>Loading...</span>;
 	}
 
-	if (error) {
-		queryClient.removeQueries([QueryKey.USER_DETAILS]);
+	if (isError) {
 		return void router.replace(`/signin?from=${encodeURIComponent(router.pathname)}`);
 	}
 
-	if (data && !error) {
-		return <>{children}</>;
-	}
+	return <>{children}</>;
 };
 
 export default Protected;
