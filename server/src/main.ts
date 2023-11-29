@@ -6,7 +6,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 /**
- * Initializes NestJS App
+ * Initializes NestJS App. Entry point to the server
  *
  * @return {*}  {Promise<void>}
  */
@@ -15,17 +15,17 @@ async function bootstrap(): Promise<void> {
 	const app: INestApplication = await NestFactory.create(AppModule, { bufferLogs: true });
 	app.useLogger(app.get(LoggerService));
 	const logger: LoggerService = new LoggerService(null);
-	logger.log('Logger initialized 📝', 'Main');
+	logger.debug('Logger initialized 📝', 'Main');
 
 	/* ------------------------------- Set Globals ------------------------------ */
 	app.setGlobalPrefix('/api');
-	logger.log('Set global prefix to /api', 'Main');
+	logger.debug('Set global prefix to /api 🔗', 'Main');
 
 	app.use(cookieParser());
-	logger.log('Initialized Cookie Parser 🍪', 'Main');
+	logger.debug('Initialized Cookie Parser 🍪', 'Main');
 
 	app.useGlobalPipes(new ValidationPipe());
-	logger.log('Initialized global validation pipe ✅', 'Main');
+	logger.debug('Initialized global validation pipe ✅', 'Main');
 
 	app.enableCors({
 		methods: '*',
@@ -35,7 +35,7 @@ async function bootstrap(): Promise<void> {
 		maxAge: 3600,
 		allowedHeaders: ['Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'request_id']
 	});
-	logger.log('Enabled CORS', 'Main');
+	logger.debug('Enabled CORS 🌐', 'Main');
 
 	app.enableShutdownHooks();
 

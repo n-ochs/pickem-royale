@@ -5,7 +5,7 @@ import { LoggerService } from '@logger/logger.service';
 import { Injectable, NestMiddleware } from '@nestjs/common';
 
 @Injectable()
-export class RequestLoggerMiddleware implements NestMiddleware {
+export class ReqResLogger implements NestMiddleware {
 	constructor(private readonly logger: LoggerService) {}
 
 	use(request: Request, response: Response, next: NextFunction): void {
@@ -15,10 +15,10 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 		const requestTs: string = dayjs().toISOString();
 		const requestId: string = (request.headers?.['request_id'] as string) || '';
 
-		this.logger.log(`REQUEST ${requestId ? '[' + requestId + ']' + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, RequestLoggerMiddleware.name);
+		this.logger.log(`REQUEST ${requestId ? '[' + requestId + ']' + ' ' : ''}${requestTs} ${method} ${path} from ${userAgent} ${ip}`, ReqResLogger.name);
 
 		if (requestId === '') {
-			this.logger.verbose('No request ID found in headers - one will be generated', RequestLoggerMiddleware.name);
+			this.logger.verbose('No request ID found in headers - one will be generated', ReqResLogger.name);
 		}
 
 		response.on('close', () => {
@@ -28,7 +28,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
 			this.logger.log(
 				`RESPONSE ${requestId ? '[' + requestId + ']' + ' ' : ''}${responseTs} ${method} ${path} ${statusCode} ${contentLength ? contentLength + ' ' : ''}- ${userAgent} ${ip}`,
-				RequestLoggerMiddleware.name
+				ReqResLogger.name
 			);
 		});
 

@@ -26,7 +26,9 @@ APIService.interceptors.response.use(
 	},
 	async (error) => {
 		if (error.response?.config?.url === '/auth/refresh' && error?.response?.status === 401) {
-			window.location.replace('/');
+			if (window.location.pathname !== '/') {
+				window.location.replace('/');
+			}
 			return Promise.reject(error);
 		}
 

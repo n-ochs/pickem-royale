@@ -20,7 +20,7 @@ const Navigation: React.FC = () => {
 		onSuccess: async () => {
 			await router.push('/');
 			toast.success('Successfully signed out.');
-			queryClient.removeQueries([QueryKey.USER_DETAILS]);
+			queryClient.removeQueries({ queryKey: [QueryKey.USER_DETAILS], exact: true });
 		},
 		onError: async () => {
 			toast.error('Something went wrong. Please try again.', { duration: 7000 });

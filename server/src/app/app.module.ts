@@ -2,9 +2,9 @@ import { ClsModule } from 'nestjs-cls';
 import { v4 as uuid } from 'uuid';
 
 import { AuthModule } from '@auth/auth.module';
-import { AtGuard } from '@common/guards';
+import { AcessTokenGuard } from '@common/guards';
 import { TransformationInterceptor } from '@common/interceptors';
-import { RequestLoggerMiddleware } from '@common/middleware';
+import { ReqResLogger } from '@common/middleware';
 import { LeagueModule } from '@league/league.module';
 import { LoggerModule } from '@logger/logger.module';
 import { LoggerService } from '@logger/logger.service';
@@ -28,7 +28,7 @@ import { StdModule } from '@std/std.module';
 	providers: [
 		{
 			provide: APP_GUARD,
-			useClass: AtGuard
+			useClass: AcessTokenGuard
 		},
 		{
 			provide: APP_INTERCEPTOR,
@@ -40,7 +40,7 @@ export class AppModule implements NestModule {
 	logger: LoggerService = new LoggerService(null);
 
 	configure(consumer: MiddlewareConsumer): void {
-		consumer.apply(RequestLoggerMiddleware).forRoutes('*');
-		this.logger.debug('Mounting RequestLoggerMiddleware to *', AppModule.name);
+		consumer.apply(ReqResLogger).forRoutes('*');
+		this.logger.debug(`Mounting ${ReqResLogger.name} to * routes 🧰`, AppModule.name);
 	}
 }

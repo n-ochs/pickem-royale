@@ -1,1 +1,1 @@
-export * from '@common/middleware/request_logger.middleware';
+export * from '@common/middleware/req_res_logger.middleware';
